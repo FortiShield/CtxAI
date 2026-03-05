@@ -14,7 +14,7 @@ For detailed guides on how to create, extend, or configure plugins, refer to:
 - [`docs/agents/AGENTS.plugins.md`](../AGENTS.plugins.md): Full-stack plugin architecture, manifest format, extension points, and Plugin Index submission.
 - [`docs/developer/plugins.md`](../docs/developer/plugins.md): Human-facing developer guide covering the full plugin lifecycle.
 - [`AGENTS.md`](../AGENTS.md): Main framework guide and backend context.
-- [`skills/a0-create-plugin/SKILL.md`](../skills/a0-create-plugin/SKILL.md): Agent-facing authoring workflow (local and community plugins).
+- [`skills/create-plugin/SKILL.md`](../skills/create-plugin/SKILL.md): Agent-facing authoring workflow (local and community plugins).
 
 ## What a Plugin Can Provide
 

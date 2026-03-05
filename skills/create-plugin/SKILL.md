@@ -1,5 +1,5 @@
 ---
-name: a0-create-plugin
+name: create-plugin
 description: Create, extend, or modify Ctx AI plugins. Follows strict full-stack conventions (usr/plugins, plugin.yaml, Store Gating, AgentContext, plugin settings). Use for UI hooks, API handlers, lifecycle extensions, or plugin settings UI.
 ---
 
