@@ -1,5 +1,5 @@
 from backend.utils.extension import Extension
-from agent import LoopData
+from backend.core.agent import LoopData
 
 # Direct import - this extension lives inside the memory plugin
 from plugins.memory.helpers import memory

@@ -5,7 +5,7 @@ from backend.utils import files, projects, subagents
 from backend.utils.print_style import PrintStyle
 
 if TYPE_CHECKING:
-    from agent import Agent
+    from backend.core.agent import Agent
 
 
 class CallSubordinate(VariablesPlugin):

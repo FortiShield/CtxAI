@@ -1,8 +1,8 @@
 from backend.utils.api import ApiHandler, Request, Response
 from backend.utils import files
-from models import ModelConfig, ModelType
+from backend.core.models import ModelConfig, ModelType
 from langchain_core.documents import Document
-from agent import AgentContext
+from backend.core.agent import AgentContext
 
 from plugins.memory.helpers.memory import Memory, get_existing_memory_subdirs, get_context_memory_subdir
 

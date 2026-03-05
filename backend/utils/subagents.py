@@ -14,7 +14,7 @@ USER_AGENTS_DIR = "usr/agents"
 type Origin = Literal["default", "user", "project", "plugin"]
 
 if TYPE_CHECKING:
-    from agent import Agent
+    from backend.core.agent import Agent
 
 
 class SubAgentListItem(BaseModel):

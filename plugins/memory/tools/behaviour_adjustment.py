@@ -1,6 +1,6 @@
 from backend.utils import files
 from backend.utils.tool import Tool, Response
-from agent import Agent
+from backend.core.agent import Agent
 from backend.utils.log import LogItem
 from plugins.memory.helpers import memory
 

@@ -1,4 +1,4 @@
-from agent import AgentContext, UserMessage
+from backend.core.agent import AgentContext, UserMessage
 from backend.utils.api import ApiHandler, Input, Output, Request, Response
 
 

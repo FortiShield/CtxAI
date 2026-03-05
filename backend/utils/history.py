@@ -297,7 +297,7 @@ class Bulk(Record):
 
 class History(Record):
     def __init__(self, agent):
-        from agent import Agent
+        from backend.core.agent import Agent
 
         self.counter = 0
         self.bulks: list[Bulk] = []

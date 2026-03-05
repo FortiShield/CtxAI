@@ -11,7 +11,7 @@ from starlette.requests import Request
 
 # Local imports
 from backend.utils.print_style import PrintStyle
-from agent import AgentContext, UserMessage, AgentContextType
+from backend.core.agent import AgentContext, UserMessage, AgentContextType
 from initialize import initialize_agent
 from backend.utils.persist_chat import remove_chat
 

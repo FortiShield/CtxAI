@@ -1,4 +1,4 @@
-from agent import AgentContext
+from backend.core.agent import AgentContext
 from backend.utils.api import ApiHandler, Request, Response
 from backend.utils.print_style import PrintStyle
 from backend.utils import persist_chat

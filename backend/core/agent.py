@@ -3,14 +3,14 @@ import asyncio, random, string, threading
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Awaitable, Coroutine, Dict, Literal
+from typing import Any, Awaitable, Callable, Coroutine, Dict, Literal
 from enum import Enum
-from . import models
+from langchain_core.messages import BaseMessage
+from backend.core import models
 
 # Imports from new backend.utils structure
-from backend.utils.files import files
-from backend.utils.logging import Log
-from backend.utils.validation import validation
+from backend.utils import files
+from backend.utils import log as Log
 from backend.utils import errors
 from backend.utils import tokens
 from backend.utils import dirty_json
@@ -24,8 +24,6 @@ from backend.utils.errors import (
     InterventionException,
     HandledException,
 )
-from backend.utils.runtime import runtime
-from backend.utils.cache import cache
 from backend.utils.extract_tools import json_parse_dirty, load_classes_from_file
 
 # Imports from backend.utils structure

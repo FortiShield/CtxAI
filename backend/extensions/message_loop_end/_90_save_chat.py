@@ -1,5 +1,5 @@
 from backend.utils.extension import Extension
-from agent import LoopData, AgentContextType
+from backend.core.agent import LoopData, AgentContextType
 from backend.utils import persist_chat
 
 

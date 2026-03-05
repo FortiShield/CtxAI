@@ -28,8 +28,8 @@ from langchain_core.documents import Document
 from . import knowledge_import
 from backend.utils.log import Log, LogItem
 from enum import Enum
-from agent import Agent, AgentContext
-import models
+from backend.core.agent import Agent, AgentContext
+from backend.core import models
 import logging
 from simpleeval import simple_eval
 

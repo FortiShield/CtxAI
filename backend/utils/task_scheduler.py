@@ -15,7 +15,7 @@ nest_asyncio.apply()
 from crontab import CronTab
 from pydantic import BaseModel, Field, PrivateAttr
 
-from agent import Agent, AgentContext, UserMessage
+from backend.core.agent import Agent, AgentContext, UserMessage
 from initialize import initialize_agent
 from backend.utils.persist_chat import save_tmp_chat
 from backend.utils.print_style import PrintStyle

@@ -1,5 +1,5 @@
 from backend.utils.extension import Extension
-from agent import Agent, LoopData
+from backend.core.agent import Agent, LoopData
 from backend.utils.secrets import get_secrets_manager
 
 

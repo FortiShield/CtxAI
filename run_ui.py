@@ -15,7 +15,7 @@ from backend.utils import files, git, mcp_server, fasta2a_server, settings as se
 from backend.utils.files import get_abs_path
 from backend.utils import runtime, dotenv, process
 from backend.utils.websocket import WebSocketHandler, validate_ws_origin
-from backend.utils.api import register_api_route, requires_auth
+from backend.utils.api import register_api_route, requires_auth, csrf_protect
 from backend.utils.print_style import PrintStyle
 from backend.utils import login
 import socketio  # type: ignore[import-untyped]
@@ -184,7 +184,7 @@ def _build_websocket_handlers_by_namespace(
     lock: threading.RLock,
 ) -> dict[str, list[WebSocketHandler]]:
     discoveries = discover_websocket_namespaces(
-        handlers_folder="python/websocket_handlers",
+        handlers_folder="backend/websocket_handlers",
         include_root_default=True,
     )
 

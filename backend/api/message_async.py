@@ -1,4 +1,4 @@
-from agent import AgentContext
+from backend.core.agent import AgentContext
 from backend.utils.defer import DeferredTask
 from backend.api.message import Message
 

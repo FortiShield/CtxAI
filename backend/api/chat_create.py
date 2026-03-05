@@ -2,7 +2,7 @@ from backend.utils.api import ApiHandler, Input, Output, Request, Response
 
 
 from backend.utils import settings, projects, guids
-from agent import AgentContext
+from backend.core.agent import AgentContext
 
 
 class CreateChat(ApiHandler):

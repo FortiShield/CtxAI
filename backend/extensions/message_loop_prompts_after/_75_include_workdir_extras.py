@@ -1,5 +1,5 @@
 from backend.utils.extension import Extension
-from agent import LoopData
+from backend.core.agent import LoopData
 from backend.utils import projects
 from backend.utils import settings
 from backend.utils import runtime

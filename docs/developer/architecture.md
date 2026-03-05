@@ -45,10 +45,10 @@ This architecture ensures:
 | `/memory` | Persistent agent memory storage |
 | `/prompts` | Default system and tool prompt templates |
 | `/python` | Core Python codebase |
-| `/python/api` | API endpoints and interfaces |
-| `/python/extensions` | Modular extensions |
-| `/python/helpers` | Utility functions |
-| `/python/tools` | Tool implementations |
+| `/backend/api` | API endpoints and interfaces |
+| `/backend/extensions` | Modular extensions |
+| `/backend/utils` | Utility functions |
+| `/backend/tools` | Tool implementations |
 | `/tmp` | Temporary runtime data |
 | `/usr/chats` | Saved chat history (JSON) |
 | `/usr/secrets.env` | Secrets store (not always included in backups) |
@@ -140,7 +140,7 @@ Users can create custom tools to extend Ctx AI's capabilities. Custom tools can 
 
 1. Create `agent.system.tool.$TOOL_NAME.md` in `agents/<agent_profile>/prompts/`
 2. Add the reference in `agent.system.tools.md` within the same prompt scope
-3. If needed, implement tool class in `python/tools` using `Tool` base class
+3. If needed, implement tool class in `backend/tools` using `Tool` base class
 4. Follow existing patterns for consistency
 
 > [!NOTE]
@@ -319,7 +319,7 @@ Skills are surfaced via description/tag matching. You can also use the `skills_t
 Extensions are a powerful feature of Ctx AI, designed to keep the main codebase clean and organized while allowing for greater flexibility and modularity.
 
 #### Structure
-Extensions can be found in `python/extensions` directory:
+Extensions can be found in `backend/extensions` directory:
 - **Folder Organization**: Extensions are stored in designated subfolders corresponding to different aspects of the agent's message loop
 - **Execution Order**: Files are executed in alphabetical order for predictable behavior
 - **Naming Convention**: Files start with numbers to control execution order
@@ -331,7 +331,7 @@ Extensions can be found in `python/extensions` directory:
 - **System Integration**: Manage interaction with external systems
 
 #### Adding Extensions
-1. Create Python file in appropriate `python/extensions` subfolder
+1. Create Python file in appropriate `backend/extensions` subfolder
 2. Follow naming convention for execution order (start with number)
 3. Implement functionality following existing patterns
 4. Ensure compatibility with main system

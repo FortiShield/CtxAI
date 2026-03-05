@@ -10,7 +10,7 @@ from typing import Iterator
 import pytest
 from flask import Flask
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -89,6 +89,9 @@ def _temporary_probe_plugin(surface: str) -> Iterator[tuple[str, str]]:
             ),
             encoding="utf-8",
         )
+        # Create plugin.yaml to ensure it is recognized as a plugin
+        plugin_yaml = Path(temp_plugin_dir) / "plugin.yaml"
+        plugin_yaml.write_text("title: Test Probe Plugin\nversion: 0.1.0\nalways_enabled: true", encoding="utf-8")
         yield plugin_id, probe_file.name
 
 

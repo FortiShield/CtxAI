@@ -1,6 +1,6 @@
 from backend.utils.extension import Extension
 from backend.utils import plugins
-from agent import Agent, LoopData
+from backend.core.agent import Agent, LoopData
 
 
 class TextEditorPrompt(Extension):

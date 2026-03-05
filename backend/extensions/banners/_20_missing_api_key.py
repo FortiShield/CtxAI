@@ -1,6 +1,6 @@
 from backend.utils.extension import Extension
 from backend.utils import settings as settings_helper
-import models
+from backend.core import models
 
 
 class MissingApiKeyCheck(Extension):

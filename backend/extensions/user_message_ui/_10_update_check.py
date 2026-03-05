@@ -1,6 +1,6 @@
 from backend.utils import notification
 from backend.utils.extension import Extension
-from agent import LoopData
+from backend.core.agent import LoopData
 from backend.utils import settings, update_check
 import datetime
 

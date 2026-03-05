@@ -5,7 +5,7 @@ from backend.utils import plugins
 class LoadWebuiExtensions(ApiHandler):
     """
     API endpoint for Welcome Screen banners.
-    Add checks as extension scripts in python/extensions/banners/ or usr/extensions/banners/
+    Add checks as extension scripts in backend/extensions/banners/ or usr/extensions/banners/
     """
 
     async def process(self, input: dict, request: Request) -> dict | Response:

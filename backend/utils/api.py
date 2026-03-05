@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Union, TypedDict, Dict, Any
 from flask import Request, Response, jsonify, Flask, session, request, send_file, redirect, url_for
 from werkzeug.wrappers.response import Response as BaseResponse
-from agent import AgentContext
+from backend.core.agent import AgentContext
 from initialize import initialize_agent
 from backend.utils.print_style import PrintStyle
 from backend.utils.errors import format_error
@@ -217,9 +217,9 @@ def register_api_route(app: Flask, lock: ThreadLockType) -> None:
         # Try built-in api folder first, then plugin api folders
         handler_cls: type[ApiHandler] | None = None
 
-        # Check built-in python/api/<path>.py
-        builtin_file = files.get_abs_path(f"python/api/{path}.py")
-        if files.is_in_dir(builtin_file, files.get_abs_path("python/api")) and files.exists(builtin_file):
+        # Check built-in backend/api/<path>.py
+        builtin_file = files.get_abs_path(f"backend/api/{path}.py")
+        if files.is_in_dir(builtin_file, files.get_abs_path("backend/api")) and files.exists(builtin_file):
             classes = load_classes_from_file(builtin_file, ApiHandler)
             if classes:
                 handler_cls = classes[0]

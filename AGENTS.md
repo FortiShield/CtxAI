@@ -93,9 +93,9 @@ When running in Docker, Ctx AI uses two distinct Python runtimes to isolate the 
 
 Key Files:
 - agent.py: Defines AgentContext and the main Agent class.
-- python/helpers/plugins.py: Plugin discovery and configuration logic.
+- backend/utils/plugins.py: Plugin discovery and configuration logic.
 - webui/js/AlpineStore.js: Store factory for reactive frontend state.
-- python/helpers/api.py: Base class for all API endpoints.
+- backend/utils/api.py: Base class for all API endpoints.
 - docs/agents/AGENTS.components.md: Deep dive into the frontend component architecture.
 - docs/agents/AGENTS.modals.md: Guide to the stacked modal system.
 - docs/agents/AGENTS.plugins.md: Comprehensive guide to the full-stack plugin system.
@@ -108,8 +108,8 @@ Key Files:
 - Context Access: Use from agent import AgentContext, AgentContextType (not backend.utils.context).
 - Communication: Use mq from backend.utils.messages to log proactive UI messages:
   mq.log_user_message(context.id, "Message", source="Plugin")
-- API Handlers: Derive from ApiHandler in python/helpers/api.py.
-- Extensions: Use the extension framework in python/helpers/extension.py for lifecycle hooks.
+- API Handlers: Derive from ApiHandler in backend/utils/api.py.
+- Extensions: Use the extension framework in backend/utils/extension.py for lifecycle hooks.
 - Error Handling: Use RepairableException for errors the LLM might be able to fix.
 
 ### Frontend (Alpine.js)

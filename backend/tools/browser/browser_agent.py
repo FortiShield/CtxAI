@@ -1,7 +1,7 @@
 import asyncio
 import time
 from typing import Optional, cast
-from agent import Agent, InterventionException
+from backend.core.agent import Agent, InterventionException
 from pathlib import Path
 
 from backend.utils.tool import Tool, Response

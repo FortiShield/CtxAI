@@ -1,5 +1,5 @@
-from agent import AgentConfig
-import models
+from backend.core.agent import AgentConfig
+from backend.core import models
 from backend.utils import runtime, settings, defer, extension
 from backend.utils.print_style import PrintStyle
 

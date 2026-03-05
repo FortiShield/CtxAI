@@ -1,5 +1,5 @@
 import json
-from agent import LoopData
+from backend.core.agent import LoopData
 from backend.utils.extension import Extension
 
 

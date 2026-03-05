@@ -6,7 +6,7 @@ import re
 import subprocess
 from typing import Any, Literal, TypedDict, cast, TypeVar
 
-import models
+from backend.core import models
 from backend.utils import runtime, whisper, defer, git, subagents
 from . import files, dotenv
 from backend.utils.print_style import PrintStyle
@@ -576,7 +576,7 @@ def get_default_settings() -> Settings:
 def _apply_settings(previous: Settings | None):
     global _settings
     if _settings:
-        from agent import AgentContext
+        from backend.core.agent import AgentContext
         from initialize import initialize_agent
 
         config = initialize_agent()

@@ -1,5 +1,5 @@
 from backend.utils.extension import Extension
-from agent import LoopData
+from backend.core.agent import LoopData
 from backend.utils.defer import DeferredTask, THREAD_BACKGROUND
 
 DATA_NAME_TASK = "_organize_history_task"

@@ -80,6 +80,8 @@ dependencies = [
     "python-socketio>=5.14.2",
     "uvicorn>=0.38.0",
     "wsproto>=1.2.0",
+    "litellm>=1.75.3",
+    "openai-whisper>=20250625",
 ]
 
 [project.optional-dependencies]

@@ -8,10 +8,10 @@ import asyncio
 import inspect
 
 if TYPE_CHECKING:
-    from agent import Agent
+    from backend.core.agent import Agent
 
 
-DEFAULT_EXTENSIONS_FOLDER = "python/extensions"
+DEFAULT_EXTENSIONS_FOLDER = "backend/extensions"
 USER_EXTENSIONS_FOLDER = "usr/extensions"
 
 _CACHE_AREA = "extension_folder_classes(extensions)(plugins)"
@@ -60,7 +60,7 @@ def extensible(func):
     """
     @wraps(func)
     async def _inner_async(*args, **kwargs):
-        from agent import Agent
+        from backend.core.agent import Agent
 
         # prepare extension points data
         module_name = getattr(func, "__module__", "").replace(".", "_")

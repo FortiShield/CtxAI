@@ -1,7 +1,7 @@
 from backend.utils.api import ApiHandler, Input, Output, Request
 from backend.utils.task_scheduler import TaskScheduler, TaskState
 from backend.utils.localization import Localization
-from agent import AgentContext
+from backend.core.agent import AgentContext
 from backend.utils import persist_chat
 
 

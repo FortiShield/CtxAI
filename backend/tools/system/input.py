@@ -1,4 +1,4 @@
-from agent import Agent, UserMessage
+from backend.core.agent import Agent, UserMessage
 from backend.utils.tool import Tool, Response
 from backend.tools.execution.code_execution_tool import CodeExecution
 

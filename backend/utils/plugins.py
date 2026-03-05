@@ -17,7 +17,7 @@ from backend.utils import files, print_style, yaml as yaml_helper, cache
 from pydantic import BaseModel, Field
 
 if TYPE_CHECKING:
-    from agent import Agent
+    from backend.core.agent import Agent
 
 # Extracts target selector from <meta name="plugin-target" content="...">
 _META_TARGET_RE = re.compile(
@@ -350,14 +350,24 @@ def toggle_plugin(
 
 
 def get_webui_extensions(agent: Agent | None, extension_point: str, filters: List[str] | None = None):
-    entries: List[str] = []
+    entries: List[dict] = []
     effective_filters = filters or ["*"]
+    enabled = get_enabled_plugins(agent)
 
-    for filter in effective_filters:
-        extensions = get_enabled_plugin_paths(agent, "extensions", "webui", extension_point, filter)
-        for extension in extensions:
-            rel_path = files.deabsolute_path(extension)
-            entries.append(rel_path)
+    for plugin in enabled:
+        base_dir = find_plugin_dir(plugin)
+        if not base_dir:
+            continue
+
+        for filter in effective_filters:
+            path_pattern = files.get_abs_path(base_dir, "extensions", "webui", extension_point, filter)
+            extensions = files.find_existing_paths_by_pattern(path_pattern)
+            for extension in extensions:
+                rel_path = files.deabsolute_path(extension)
+                entries.append({
+                    "plugin_id": plugin,
+                    "path": rel_path
+                })
 
     return entries
 

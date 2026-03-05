@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 import pytz  # type: ignore[import-untyped]
 
-from agent import AgentContext, AgentContextType
+from backend.core.agent import AgentContext, AgentContextType
 
 from backend.utils.dotenv import get_dotenv_value
 from backend.utils.localization import Localization

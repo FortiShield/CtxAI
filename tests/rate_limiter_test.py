@@ -1,7 +1,7 @@
 
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import models
+from backend.core import models
 
 provider = "openrouter"
 name = "deepseek/deepseek-r1"
@@ -27,5 +27,5 @@ async def run():
     print("Reasoning: ", reasoning)
 
 
-import asyncio
-asyncio.run(run())
+# import asyncio
+# asyncio.run(run())

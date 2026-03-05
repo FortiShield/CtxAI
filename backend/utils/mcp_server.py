@@ -8,7 +8,7 @@ import fastmcp
 from fastmcp import FastMCP
 import contextvars
 
-from agent import AgentContext, AgentContextType, UserMessage
+from backend.core.agent import AgentContext, AgentContextType, UserMessage
 from backend.utils.persist_chat import remove_chat
 from initialize import initialize_agent
 from backend.utils.print_style import PrintStyle

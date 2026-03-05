@@ -9,7 +9,7 @@ from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, TYPE_CHE
 from backend.utils import files, subagents, projects, file_tree, runtime
 
 if TYPE_CHECKING:
-    from agent import Agent
+    from backend.core.agent import Agent
 
 try:
     import yaml  # type: ignore

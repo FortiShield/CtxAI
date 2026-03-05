@@ -15,7 +15,7 @@ from langchain_community.vectorstores.utils import (
 from langchain.embeddings import CacheBackedEmbeddings
 from simpleeval import simple_eval
 
-from agent import Agent
+from backend.core.agent import Agent
 from backend.utils import guids
 
 

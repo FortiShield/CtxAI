@@ -10,7 +10,7 @@ from backend.utils.errors import RepairableException
 from backend.utils import files
 
 if TYPE_CHECKING:
-    from agent import AgentContext
+    from backend.core.agent import AgentContext
 
 
 # New alias-based placeholder format §§secret(KEY)
@@ -512,7 +512,7 @@ def get_secrets_manager(context: "AgentContext|None" = None) -> SecretsManager:
 
     # use AgentContext from contextvars if no context provided
     if not context:
-        from agent import AgentContext
+        from backend.core.agent import AgentContext
         context = AgentContext.current()
 
     # merged with project secrets if active

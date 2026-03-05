@@ -2,7 +2,7 @@ from collections import OrderedDict
 from datetime import datetime
 from typing import Any
 import uuid
-from agent import Agent, AgentConfig, AgentContext, AgentContextType
+from backend.core.agent import Agent, AgentConfig, AgentContext, AgentContextType
 from backend.utils import files, history
 import json
 from initialize import initialize_agent

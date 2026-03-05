@@ -1,6 +1,6 @@
 from backend.utils.api import ApiHandler
 from flask import Request, Response
-from agent import AgentContext
+from backend.core.agent import AgentContext
 
 
 class NotificationsClear(ApiHandler):

@@ -11,7 +11,7 @@ from plugins.memory.helpers.memory import Memory
 from backend.utils.dirty_json import DirtyJson
 from backend.utils.log import LogItem
 from backend.utils.print_style import PrintStyle
-from agent import Agent
+from backend.core.agent import Agent
 from plugins.memory.tools.memory_load import DEFAULT_THRESHOLD as DEFAULT_MEMORY_THRESHOLD
 
 

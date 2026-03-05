@@ -8,7 +8,7 @@ from backend.utils.task_scheduler import (
     TaskScheduler, ScheduledTask, AdHocTask, PlannedTask,
     serialize_task, TaskState, TaskSchedule, TaskPlan, parse_datetime, serialize_datetime
 )
-from agent import AgentContext
+from backend.core.agent import AgentContext
 from backend.utils import persist_chat
 from backend.utils.projects import get_context_project_name, load_basic_project_data
 

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from backend.utils import guids
 
 if TYPE_CHECKING:
-    from agent import AgentContext
+    from backend.core.agent import AgentContext
 
 from backend.utils.print_style import PrintStyle
 
@@ -149,7 +149,7 @@ def log_user_message(
 
 def send_message(context: "AgentContext", item: dict, source: str = " (from queue)"):
     """Send a single queued message (log + communicate)."""
-    from agent import UserMessage  # Import here to avoid circular import
+    from backend.core.agent import UserMessage  # Import here to avoid circular import
     
     message = item.get("text", "")
     attachments = item.get("attachments", [])
@@ -170,7 +170,7 @@ def send_next(context: "AgentContext") -> bool:
 
 def send_all_aggregated(context: "AgentContext") -> int:
     """Aggregate and send all queued messages as one. Returns count of items sent."""
-    from agent import UserMessage  # Import here to avoid circular import
+    from backend.core.agent import UserMessage  # Import here to avoid circular import
     
     if not has_queue(context):
         return 0

@@ -25,8 +25,8 @@ This guide consolidates everything you need to design, implement, and troublesho
 - **Runtime (`run_ui.py`)** – boots `python-socketio.AsyncServer` inside an ASGI stack served by Uvicorn. Flask routes are mounted via `uvicorn.middleware.wsgi.WSGIMiddleware`, and Flask + Socket.IO share the same process so session cookies and CSRF semantics stay aligned.
 - **Singleton handlers** – every `WebSocketHandler` subclass exposes `get_instance()` and is registered exactly once. Direct instantiation raises `SingletonInstantiationError`, keeping shared state and lifecycle hooks deterministic.
 - **Dispatcher offload** – handler entrypoints (`process_event`, `on_connect`, `on_disconnect`) run in a background worker loop (via `DeferredTask`) so blocking handlers cannot stall the Socket.IO transport. Socket.IO emits/disconnects are marshalled back to the dispatcher loop. Diagnostic timing and payload summaries are only built when Event Console watchers are subscribed (development mode).
-- **`python/helpers/websocket_manager.py`** – orchestrates routing, buffering, aggregation, metadata envelopes, and session tracking. Think of it as the “switchboard” for every WebSocket event.
-- **`python/helpers/websocket.py`** – base class for application handlers. Provides lifecycle hooks, helper methods (`emit_to`, `broadcast`, `request`, `request_all`) and identifier metadata.
+- **`backend/utils/websocket_manager.py`** – orchestrates routing, buffering, aggregation, metadata envelopes, and session tracking. Think of it as the “switchboard” for every WebSocket event.
+- **`backend/utils/websocket.py`** – base class for application handlers. Provides lifecycle hooks, helper methods (`emit_to`, `broadcast`, `request`, `request_all`) and identifier metadata.
 - **`webui/js/websocket.js`** – frontend singleton exposing a minimal client API (`emit`, `request`, `on`, `off`) with lazy connection management and development-only logging (no client-side `broadcast()` or `requestAll()` helpers).
 - **Developer Harness (`webui/components/settings/developer/websocket-test-store.js`)** – manual and automatic validation suite for emit/request flows, timeout behaviour (including the default unlimited wait), correlation ID propagation, envelope metadata, subscription persistence across reconnect, and development-mode diagnostics.
 - **Specs & Contracts** – canonical definitions live under `specs/003-websocket-event-handlers/`. This guide references those documents but focuses on applied usage.
@@ -63,7 +63,7 @@ Useful mental model: **client ↔ manager ↔ handler**. The manager normalises 
 Ctx AI can also push poll-shaped state snapshots over the WebSocket bus, replacing the legacy 4Hz `/poll` loop while preserving the existing UI update contract.
 
 - **Handshake**: the frontend sync store (`/components/sync/sync-store.js`) calls `websocket.request("state_request", { context, log_from, notifications_from, timezone })` to establish per-tab cursors and a `seq_base`.
-- **Push**: the server emits `state_push` events containing `{ runtime_epoch, seq, snapshot }`, where `snapshot` is exactly the `/poll` payload shape built by `python/helpers/state_snapshot.py`.
+- **Push**: the server emits `state_push` events containing `{ runtime_epoch, seq, snapshot }`, where `snapshot` is exactly the `/poll` payload shape built by `backend/utils/state_snapshot.py`.
 - **Coalescing**: the backend `StateMonitor` coalesces dirties per SID (25ms window) so streaming updates stay smooth without unbounded trailing-edge debounce.
 - **Degraded fallback**: if the WebSocket handshake/push path is unhealthy, the UI enters `DEGRADED` and uses `/poll` as a fallback; while degraded, push snapshots are ignored to avoid racey double-writes.
 
@@ -661,7 +661,7 @@ The manager validates the payload, resolves/creates `correlationId`, and passes 
   - [`frontend-api.md`](../specs/003-websocket-event-handlers/contracts/frontend-api.md)
   - [`event-schemas.md`](../specs/003-websocket-event-handlers/contracts/event-schemas.md)
   - [`security-contract.md`](../specs/003-websocket-event-handlers/contracts/security-contract.md)
-- **Implementation Reference** – Inspect `python/helpers/websocket_manager.py`, `python/helpers/websocket.py`, `webui/js/websocket.js`, and the developer harness in `webui/components/settings/developer/websocket-test-store.js` for concrete examples.
+- **Implementation Reference** – Inspect `backend/utils/websocket_manager.py`, `backend/utils/websocket.py`, `webui/js/websocket.js`, and the developer harness in `webui/components/settings/developer/websocket-test-store.js` for concrete examples.
 
 > **Tip:** When extending the infrastructure (new metadata) start by updating the contracts, sync the manager/frontend helpers, and then document the change here so producers and consumers stay in lockstep.
 

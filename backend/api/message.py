@@ -1,4 +1,4 @@
-from agent import AgentContext, UserMessage
+from backend.core.agent import AgentContext, UserMessage
 from backend.utils.api import ApiHandler, Request, Response
 
 from backend.utils import files, extension, message_queue as mq

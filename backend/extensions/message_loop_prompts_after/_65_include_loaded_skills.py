@@ -1,7 +1,7 @@
 from backend.utils.extension import Extension
 from backend.utils import skills
 from backend.tools.skills_tool import DATA_NAME_LOADED_SKILLS
-from agent import LoopData
+from backend.core.agent import LoopData
 
 
 class IncludeLoadedSkills(Extension):

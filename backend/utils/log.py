@@ -12,7 +12,7 @@ from backend.utils.strings import truncate_text_by_ratio
 
 
 if TYPE_CHECKING:
-    from agent import AgentContext
+    from backend.core.agent import AgentContext
 
 
 _MARK_DIRTY_ALL = None
@@ -419,7 +419,7 @@ class Log:
     def _mask_recursive(self, obj: T) -> T:
         """Recursively mask secrets in nested objects."""
         try:
-            from agent import AgentContext
+            from backend.core.agent import AgentContext
             secrets_mgr = get_secrets_manager(self.context or AgentContext.current())
 
             # debug helper to identify context mismatch

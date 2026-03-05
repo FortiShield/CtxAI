@@ -24,7 +24,7 @@ from langchain.schema import SystemMessage, HumanMessage
 
 from backend.utils.print_style import PrintStyle
 from backend.utils import files, errors
-from agent import Agent
+from backend.core.agent import Agent
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 

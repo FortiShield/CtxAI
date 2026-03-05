@@ -1,5 +1,5 @@
 from backend.utils.tool import Tool, Response
-from agent import AgentContext
+from backend.core.agent import AgentContext
 from backend.utils.notification import NotificationPriority, NotificationType
 
 class NotifyUserTool(Tool):

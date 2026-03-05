@@ -1,7 +1,7 @@
 import base64
 import os
 from datetime import datetime, timedelta
-from agent import AgentContext, UserMessage, AgentContextType
+from backend.core.agent import AgentContext, UserMessage, AgentContextType
 from backend.utils.api import ApiHandler, Request, Response
 from backend.utils import files, projects
 from backend.utils.print_style import PrintStyle

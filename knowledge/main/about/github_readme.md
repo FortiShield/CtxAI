@@ -99,7 +99,7 @@ docker run -p 50001:80 ctxos/ctxai
 - The whole behavior is defined by a system prompt in the **prompts/default/agent.system.md** file. Change this prompt and change the framework dramatically.
 - The framework does not guide or limit the agent in any way. There are no hard-coded rails that agents have to follow.
 - Every prompt, every small message template sent to the agent in its communication loop can be found in the **prompts/** folder and changed.
-- Every default tool can be found in the **python/tools/** folder and changed or copied to create new predefined tools.
+- Every default tool can be found in the **backend/tools/** folder and changed or copied to create new predefined tools.
 - **Automated configuration** via `A0_SET_` environment variables for deployment automation and easy setup.
 
 ![Prompts](/docs/res/profiles.png)

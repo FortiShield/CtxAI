@@ -2,7 +2,7 @@ import asyncio
 from backend.utils import errors, plugins
 from backend.utils.extension import Extension
 from backend.utils.dirty_json import DirtyJson
-from agent import LoopData
+from backend.core.agent import LoopData
 from backend.utils.log import LogItem
 from backend.utils.defer import DeferredTask, THREAD_BACKGROUND
 

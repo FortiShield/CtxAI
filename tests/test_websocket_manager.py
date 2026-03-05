@@ -806,11 +806,13 @@ def test_debug_logging_respects_runtime_flag(monkeypatch):
 
     monkeypatch.setattr("backend.utils.print_style.PrintStyle.debug", staticmethod(capture))
     monkeypatch.setattr("backend.utils.websocket_manager.runtime.is_development", lambda: False)
+    monkeypatch.setenv("A0_WS_DEBUG", "0")
 
     manager._debug("should-not-log")  # noqa: SLF001
     assert logs == []
 
     monkeypatch.setattr("backend.utils.websocket_manager.runtime.is_development", lambda: True)
+    monkeypatch.setenv("A0_WS_DEBUG", "1")
     manager._debug("should-log")  # noqa: SLF001
     assert logs == ["should-log"]
 

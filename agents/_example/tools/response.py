@@ -1,7 +1,7 @@
 from backend.utils.tool import Tool, Response
 
 # example of a tool redefinition
-# the original response tool is in python/tools/response.py
+# the original response tool is in backend/tools/response.py
 # for the example agent this version will be used instead
 
 class ResponseTool(Tool):

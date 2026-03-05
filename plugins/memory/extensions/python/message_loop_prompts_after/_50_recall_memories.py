@@ -1,6 +1,6 @@
 import asyncio
 from backend.utils.extension import Extension
-from agent import LoopData
+from backend.core.agent import LoopData
 from backend.utils import dirty_json, errors, log, plugins
 
 # Direct import - this extension lives inside the memory plugin

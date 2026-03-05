@@ -1,7 +1,7 @@
 from typing import Any
 from backend.utils.extension import Extension
 from backend.utils.mcp_handler import MCPConfig
-from agent import Agent, LoopData
+from backend.core.agent import Agent, LoopData
 from backend.utils.settings import get_settings
 from backend.utils import projects, skills
 

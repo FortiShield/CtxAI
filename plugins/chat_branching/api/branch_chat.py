@@ -6,7 +6,7 @@ from backend.utils.persist_chat import (
     _deserialize_context,
     save_tmp_chat,
 )
-from agent import AgentContext
+from backend.core.agent import AgentContext
 
 
 class BranchChat(ApiHandler):
