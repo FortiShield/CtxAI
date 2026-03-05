@@ -29,7 +29,6 @@ from backend.utils import (
     subagents,
     tokens,
 )
-from backend.utils.print_style import PrintStyle
 from backend.utils.defer import DeferredTask
 from backend.utils.dirty_json import DirtyJson
 from backend.utils.errors import (
@@ -40,6 +39,7 @@ from backend.utils.errors import (
 from backend.utils.extension import call_extensions, extensible
 from backend.utils.extract_tools import json_parse_dirty, load_classes_from_file
 from backend.utils.localization import Localization
+from backend.utils.print_style import PrintStyle
 
 
 class AgentContextType(Enum):
@@ -222,9 +222,7 @@ class AgentContext:
         items: list[Log.LogItem] = []
         for context in AgentContext.all():
             items.append(
-                context.log.log(
-                    type, heading, content, kvps, update_progress, id, **kwargs
-                )
+                context.log.log(type, heading, content, kvps, update_progress, id, **kwargs)
             )
         return items
 
@@ -245,9 +243,7 @@ class AgentContext:
     def nudge(self):
         self.kill_process()
         self.paused = False
-        self.task = self.communicate(
-            UserMessage(self.ctx.read_prompt("fw.msg_nudge.md"))
-        )
+        self.task = self.communicate(UserMessage(self.ctx.read_prompt("fw.msg_nudge.md")))
         return self.task
 
     @extensible
@@ -269,18 +265,14 @@ class AgentContext:
             while intervention_agent and broadcast_level != 0:
                 intervention_agent.intervention = msg
                 broadcast_level -= 1
-                intervention_agent = intervention_agent.data.get(
-                    Agent.DATA_NAME_SUPERIOR, None
-                )
+                intervention_agent = intervention_agent.data.get(Agent.DATA_NAME_SUPERIOR, None)
         else:
             self.task = self.run_task(self._process_chain, current_agent, msg)
 
         return self.task
 
     @extensible
-    def run_task(
-        self, func: Callable[..., Coroutine[Any, Any, Any]], *args: Any, **kwargs: Any
-    ):
+    def run_task(self, func: Callable[..., Coroutine[Any, Any, Any]], *args: Any, **kwargs: Any):
         if not self.task:
             self.task = DeferredTask(
                 thread_name=self.__class__.__name__,
@@ -369,9 +361,7 @@ class Agent:
     DATA_NAME_CTX_WINDOW = "ctx_window"
 
     @extensible
-    def __init__(
-        self, number: int, config: AgentConfig, context: AgentContext | None = None
-    ):
+    def __init__(self, number: int, config: AgentConfig, context: AgentContext | None = None):
 
         # agent config
         self.config = config
@@ -408,9 +398,7 @@ class Agent:
                     self.loop_data.params_temporary = {}  # clear temporary params
 
                     # call message_loop_start extensions
-                    await self.call_extensions(
-                        "message_loop_start", loop_data=self.loop_data
-                    )
+                    await self.call_extensions("message_loop_start", loop_data=self.loop_data)
                     await self.handle_intervention()
 
                     try:
@@ -418,9 +406,7 @@ class Agent:
                         prompt = await self.prepare_prompt(loop_data=self.loop_data)
 
                         # call before_main_llm_call extensions
-                        await self.call_extensions(
-                            "before_main_llm_call", loop_data=self.loop_data
-                        )
+                        await self.call_extensions("before_main_llm_call", loop_data=self.loop_data)
                         await self.handle_intervention()
 
                         async def reasoning_callback(chunk: str, full: str):
@@ -467,14 +453,10 @@ class Agent:
                         await self.handle_intervention(agent_response)
 
                         # Notify extensions to finalize their stream filters
-                        await self.call_extensions(
-                            "reasoning_stream_end", loop_data=self.loop_data
-                        )
+                        await self.call_extensions("reasoning_stream_end", loop_data=self.loop_data)
                         await self.handle_intervention(agent_response)
 
-                        await self.call_extensions(
-                            "response_stream_end", loop_data=self.loop_data
-                        )
+                        await self.call_extensions("response_stream_end", loop_data=self.loop_data)
 
                         await self.handle_intervention(agent_response)
 
@@ -486,9 +468,7 @@ class Agent:
                             # Append warning message to the history
                             warning_msg = self.read_prompt("fw.msg_repeat.md")
                             self.hist_add_warning(message=warning_msg)
-                            PrintStyle(font_color="orange", padding=True).print(
-                                warning_msg
-                            )
+                            PrintStyle(font_color="orange", padding=True).print(warning_msg)
                             self.context.log.log(type="warning", content=warning_msg)
 
                         else:  # otherwise proceed with tool
@@ -508,9 +488,7 @@ class Agent:
                         if (
                             self.context.task and self.context.task.is_alive()
                         ):  # don't call extensions post mortem
-                            await self.call_extensions(
-                                "message_loop_end", loop_data=self.loop_data
-                            )
+                            await self.call_extensions("message_loop_end", loop_data=self.loop_data)
 
             # exceptions outside message loop:
             except Exception as e:
@@ -629,9 +607,7 @@ class Agent:
     def parse_prompt(self, _prompt_file: str, **kwargs):
         dirs = subagents.get_paths(self, "prompts")
 
-        prompt = files.parse_file(
-            _prompt_file, _directories=dirs, _agent=self, **kwargs
-        )
+        prompt = files.parse_file(_prompt_file, _directories=dirs, _agent=self, **kwargs)
         return prompt
 
     @extensible
@@ -650,18 +626,12 @@ class Agent:
         self.data[field] = value
 
     @extensible
-    def hist_add_message(
-        self, ai: bool, content: history.MessageContent, tokens: int = 0
-    ):
+    def hist_add_message(self, ai: bool, content: history.MessageContent, tokens: int = 0):
         self.last_message = datetime.now(timezone.utc)
         # Allow extensions to process content before adding to history
         content_data = {"content": content}
-        asyncio.run(
-            self.call_extensions("hist_add_before", content_data=content_data, ai=ai)
-        )
-        return self.history.add_message(
-            ai=ai, content=content_data["content"], tokens=tokens
-        )
+        asyncio.run(self.call_extensions("hist_add_before", content_data=content_data, ai=ai))
+        return self.history.add_message(ai=ai, content=content_data["content"], tokens=tokens)
 
     @extensible
     def hist_add_user_message(self, message: UserMessage, intervention: bool = False):
@@ -713,9 +683,7 @@ class Agent:
         asyncio.run(self.call_extensions("hist_add_tool_result", data=data))
         return self.hist_add_message(False, content=data)
 
-    def concat_messages(
-        self, messages
-    ):  # TODO add param for message range, topic, history
+    def concat_messages(self, messages):  # TODO add param for message range, topic, history
         return self.history.output_text(human_label="user", ai_label="assistant")
 
     @extensible
@@ -809,18 +777,14 @@ class Agent:
             messages=messages,
             reasoning_callback=reasoning_callback,
             response_callback=response_callback,
-            rate_limiter_callback=(
-                self.rate_limiter_callback if not background else None
-            ),
+            rate_limiter_callback=(self.rate_limiter_callback if not background else None),
             explicit_caching=explicit_caching,
         )
 
         return response, reasoning
 
     @extensible
-    async def rate_limiter_callback(
-        self, message: str, key: str, total: int, limit: int
-    ):
+    async def rate_limiter_callback(self, message: str, key: str, total: int, limit: int):
         # show the rate limit waiting in a progress bar, no need to spam the chat history
         self.context.log.set_progress(message, True)
         return False
@@ -828,9 +792,7 @@ class Agent:
     @extensible
     async def handle_intervention(self, progress: str = ""):
         await self.wait_if_paused()
-        if (
-            self.intervention
-        ):  # if there is an intervention message, but not yet processed
+        if self.intervention:  # if there is an intervention message, but not yet processed
             msg = self.intervention
             self.intervention = None  # reset the intervention message
             # If a tool was running, save its progress to history
@@ -874,19 +836,17 @@ class Agent:
             try:
                 import backend.helpers.mcp_handler as mcp_helper
 
-                mcp_tool_candidate = mcp_helper.MCPConfig.get_instance().get_tool(
-                    self, tool_name
-                )
+                mcp_tool_candidate = mcp_helper.MCPConfig.get_instance().get_tool(self, tool_name)
                 if mcp_tool_candidate:
                     tool = mcp_tool_candidate
             except ImportError:
-                PrintStyle(
-                    background_color="black", font_color="yellow", padding=True
-                ).print("MCP helper module not found. Skipping MCP tool lookup.")
+                PrintStyle(background_color="black", font_color="yellow", padding=True).print(
+                    "MCP helper module not found. Skipping MCP tool lookup."
+                )
             except Exception as e:
-                PrintStyle(
-                    background_color="black", font_color="red", padding=True
-                ).print(f"Failed to get MCP tool '{tool_name}': {e}")
+                PrintStyle(background_color="black", font_color="red", padding=True).print(
+                    f"Failed to get MCP tool '{tool_name}': {e}"
+                )
 
             # Fallback to local get_tool if MCP tool was not found or MCP lookup failed
             if not tool:
@@ -930,14 +890,10 @@ class Agent:
                 finally:
                     self.loop_data.current_tool = None
             else:
-                error_detail = (
-                    f"Tool '{raw_tool_name}' not found or could not be initialized."
-                )
+                error_detail = f"Tool '{raw_tool_name}' not found or could not be initialized."
                 self.hist_add_warning(error_detail)
                 PrintStyle(font_color="red", padding=True).print(error_detail)
-                self.context.log.log(
-                    type="warning", content=f"{self.agent_name}: {error_detail}"
-                )
+                self.context.log.log(type="warning", content=f"{self.agent_name}: {error_detail}")
         else:
             warning_msg_misformat = self.read_prompt("fw.msg_misformat.md")
             self.hist_add_warning(warning_msg_misformat)
@@ -1010,6 +966,4 @@ class Agent:
         )
 
     async def call_extensions(self, extension_point: str, **kwargs) -> Any:
-        return await call_extensions(
-            extension_point=extension_point, agent=self, **kwargs
-        )
+        return await call_extensions(extension_point=extension_point, agent=self, **kwargs)

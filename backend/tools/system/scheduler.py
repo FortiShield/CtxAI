@@ -45,9 +45,7 @@ class SchedulerTool(Tool):
         elif self.method == "wait_for_task":
             return await self.wait_for_task(**kwargs)
         else:
-            return Response(
-                message=f"Unknown method '{self.name}:{self.method}'", break_loop=False
-            )
+            return Response(message=f"Unknown method '{self.name}:{self.method}'", break_loop=False)
 
     def _resolve_project_metadata(self) -> tuple[str | None, str | None]:
         context = self.agent.context
@@ -69,9 +67,7 @@ class SchedulerTool(Tool):
         next_run_within_filter: int | None = kwargs.get("next_run_within", None)
         next_run_after_filter: int | None = kwargs.get("next_run_after", None)
 
-        tasks: list[ScheduledTask | AdHocTask | PlannedTask] = (
-            TaskScheduler.get().get_tasks()
-        )
+        tasks: list[ScheduledTask | AdHocTask | PlannedTask] = TaskScheduler.get().get_tasks()
         filtered_tasks = []
         for task in tasks:
             if state_filter and task.state not in state_filter:
@@ -112,22 +108,20 @@ class SchedulerTool(Tool):
         task_uuid: str = kwargs.get("uuid", "")
         if not task_uuid:
             return Response(message="Task UUID is required", break_loop=False)
-        task: ScheduledTask | AdHocTask | PlannedTask | None = (
-            TaskScheduler.get().get_task_by_uuid(task_uuid)
+        task: ScheduledTask | AdHocTask | PlannedTask | None = TaskScheduler.get().get_task_by_uuid(
+            task_uuid
         )
         if not task:
             return Response(message=f"Task not found: {task_uuid}", break_loop=False)
-        return Response(
-            message=json.dumps(serialize_task(task), indent=4), break_loop=False
-        )
+        return Response(message=json.dumps(serialize_task(task), indent=4), break_loop=False)
 
     async def run_task(self, **kwargs) -> Response:
         task_uuid: str = kwargs.get("uuid", "")
         if not task_uuid:
             return Response(message="Task UUID is required", break_loop=False)
         task_context: str | None = kwargs.get("context", None)
-        task: ScheduledTask | AdHocTask | PlannedTask | None = (
-            TaskScheduler.get().get_task_by_uuid(task_uuid)
+        task: ScheduledTask | AdHocTask | PlannedTask | None = TaskScheduler.get().get_task_by_uuid(
+            task_uuid
         )
         if not task:
             return Response(message=f"Task not found: {task_uuid}", break_loop=False)
@@ -143,8 +137,8 @@ class SchedulerTool(Tool):
         if not task_uuid:
             return Response(message="Task UUID is required", break_loop=False)
 
-        task: ScheduledTask | AdHocTask | PlannedTask | None = (
-            TaskScheduler.get().get_task_by_uuid(task_uuid)
+        task: ScheduledTask | AdHocTask | PlannedTask | None = TaskScheduler.get().get_task_by_uuid(
+            task_uuid
         )
         if not task:
             return Response(message=f"Task not found: {task_uuid}", break_loop=False)
@@ -167,9 +161,7 @@ class SchedulerTool(Tool):
         if TaskScheduler.get().get_task_by_uuid(task_uuid) is None:
             return Response(message=f"Task deleted: {task_uuid}", break_loop=False)
         else:
-            return Response(
-                message=f"Task failed to delete: {task_uuid}", break_loop=False
-            )
+            return Response(message=f"Task failed to delete: {task_uuid}", break_loop=False)
 
     async def create_scheduled_task(self, **kwargs) -> Response:
         # "name": "XXX",
@@ -219,9 +211,7 @@ class SchedulerTool(Tool):
             project_color=project_color,
         )
         await TaskScheduler.get().add_task(task)
-        return Response(
-            message=f"Scheduled task '{name}' created: {task.uuid}", break_loop=False
-        )
+        return Response(message=f"Scheduled task '{name}' created: {task.uuid}", break_loop=False)
 
     async def create_adhoc_task(self, **kwargs) -> Response:
         name: str = kwargs.get("name", "")
@@ -244,9 +234,7 @@ class SchedulerTool(Tool):
             project_color=project_color,
         )
         await TaskScheduler.get().add_task(task)
-        return Response(
-            message=f"Adhoc task '{name}' created: {task.uuid}", break_loop=False
-        )
+        return Response(message=f"Adhoc task '{name}' created: {task.uuid}", break_loop=False)
 
     async def create_planned_task(self, **kwargs) -> Response:
         name: str = kwargs.get("name", "")
@@ -281,9 +269,7 @@ class SchedulerTool(Tool):
             project_color=project_color,
         )
         await TaskScheduler.get().add_task(task)
-        return Response(
-            message=f"Planned task '{name}' created: {task.uuid}", break_loop=False
-        )
+        return Response(message=f"Planned task '{name}' created: {task.uuid}", break_loop=False)
 
     async def wait_for_task(self, **kwargs) -> Response:
         task_uuid: str = kwargs.get("uuid", "")
@@ -291,9 +277,7 @@ class SchedulerTool(Tool):
             return Response(message="Task UUID is required", break_loop=False)
 
         scheduler = TaskScheduler.get()
-        task: ScheduledTask | AdHocTask | PlannedTask | None = (
-            scheduler.get_task_by_uuid(task_uuid)
-        )
+        task: ScheduledTask | AdHocTask | PlannedTask | None = scheduler.get_task_by_uuid(task_uuid)
         if not task:
             return Response(message=f"Task not found: {task_uuid}", break_loop=False)
 
@@ -309,9 +293,7 @@ class SchedulerTool(Tool):
             await scheduler.reload()
             task = scheduler.get_task_by_uuid(task_uuid)
             if not task:
-                return Response(
-                    message=f"Task not found: {task_uuid}", break_loop=False
-                )
+                return Response(message=f"Task not found: {task_uuid}", break_loop=False)
 
             if task.state == TaskState.RUNNING:
                 await asyncio.sleep(1)
