@@ -235,7 +235,7 @@ Ctx AI provides a comprehensive settings interface to customize various aspects 
 
 ### Agent Configuration
 
-- **Agent Profile:** Select the agent profile (e.g., `agent0`, `hacker`, `researcher`). Profiles can override prompts, tools, and extensions.
+- **Agent Profile:** Select the agent profile (e.g., `ctx`, `hacker`, `researcher`). Profiles can override prompts, tools, and extensions.
 - **Memory Subdirectory:** Select the subdirectory for agent memory storage, allowing separation between different instances.
 - **Knowledge Subdirectory:** Specify the location of custom knowledge files to enhance the agent's understanding.
 

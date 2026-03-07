@@ -121,7 +121,7 @@ def remove_msg_files(ctxid):
 def _serialize_context(context: AgentContext):
     # serialize agents
     agents = []
-    agent = context.agent0
+    agent = context.ctx
     while agent:
         agents.append(_serialize_agent(agent))
         agent = agent.data.get(Agent.DATA_NAME_SUBORDINATE, None)
@@ -200,17 +200,17 @@ def _deserialize_context(data):
         paused=False,
         data=data.get("data", {}),
         output_data=data.get("output_data", {}),
-        # agent0=agent0,
+        # ctx=ctx,
         # streaming_agent=straming_agent,
     )
 
     agents = data.get("agents", [])
-    agent0 = _deserialize_agents(agents, config, context)
-    streaming_agent = agent0
+    ctx = _deserialize_agents(agents, config, context)
+    streaming_agent = ctx
     while streaming_agent and streaming_agent.number != data.get("streaming_agent", 0):
         streaming_agent = streaming_agent.data.get(Agent.DATA_NAME_SUBORDINATE, None)
 
-    context.agent0 = agent0
+    context.ctx = ctx
     context.streaming_agent = streaming_agent
 
     return context

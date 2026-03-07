@@ -16,7 +16,7 @@ class GetKnowledgePath(ApiHandler):
         if project_name:
             knowledge_folder = projects.get_project_meta(project_name, "knowledge")
         else:
-            knowledge_folder = get_custom_knowledge_subdir_abs(context.agent0)
+            knowledge_folder = get_custom_knowledge_subdir_abs(context.ctx)
 
         knowledge_folder = files.normalize_a0_path(knowledge_folder)
 

@@ -92,7 +92,7 @@ class ApiMessage(ApiHandler):
                 )
 
             # Validation: if agent profile is provided, it must match the exising
-            if agent_profile and context.agent0.config.profile != agent_profile:
+            if agent_profile and context.ctx.config.profile != agent_profile:
                 return Response(
                     '{"error": "Cannot override agent profile on existing context"}',
                     status=400,

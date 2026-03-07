@@ -13,7 +13,7 @@ class ProcessQueue(Extension):
         if not self.agent:
             return
 
-        # Only process for agent0 (main agent)
+        # Only process for ctx (main agent)
         if self.agent.number != 0:
             return
 
