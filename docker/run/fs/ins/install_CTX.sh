@@ -34,10 +34,8 @@ fi
 # # Install some packages in specific variants
 # pip install torch --index-url https://download.pytorch.org/whl/cpu
 
-# Install remaining CTX python packages
-uv pip install -r /git/ctxai/requirements.txt
-# override for packages that have unnecessarily strict dependencies
-uv pip install -r /git/ctxai/requirements2.txt
+# Install CTX python packages
+uv pip install -e /git/ctxai
 
 # install playwright
 bash /ins/install_playwright.sh "$@"

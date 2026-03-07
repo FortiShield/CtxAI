@@ -4,7 +4,7 @@ set -e
 # activate venv
 . "/ins/setup_venv.sh" "$@"
 
-# install playwright if not installed (should be from requirements.txt)
+# install playwright
 uv pip install playwright
 
 # set PW installation path to /ctx/tmp/playwright
