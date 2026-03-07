@@ -9,9 +9,11 @@ set -e
 # else
     # source /opt/venv/bin/activate
 # fi
-if [ ! -d /opt/venv-ctx ]; then
-    if [ -d /opt/venv-a0 ]; then
-        mv /opt/venv-a0 /opt/venv-ctx
-    fi
+
+if [ -d /opt/venv-a0 ] && [ ! -d /opt/venv-ctx ]; then
+    ln -s /opt/venv-a0 /opt/venv-ctx
 fi
-source /opt/venv-ctx/bin/activate
+
+if [ -d /opt/venv-ctx ]; then
+    source /opt/venv-ctx/bin/activate
+fi
