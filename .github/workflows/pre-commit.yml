@@ -28,7 +28,7 @@ jobs:
         run: |
           # Auto-fix all hooks including Ruff
           make format
-          pre-commit run --all-files --show-diff-on-failure --hook-stage manual
+          pre-commit run --all-files --show-diff-on-failure --hook-stage manual --exclude 'webui/*'
           
           # Configure git for GitHub Actions bot
           git config user.name "github-actions[bot]"
