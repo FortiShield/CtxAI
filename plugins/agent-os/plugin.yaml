@@ -1,0 +1,6 @@
+name: Agent OS
+description: Standards discovery, extraction, and deployment system for AI-assisted development. Keeps agents aligned with project coding conventions.
+version: 1.0.0
+settings_sections: []
+per_project_config: true
+per_agent_config: false
