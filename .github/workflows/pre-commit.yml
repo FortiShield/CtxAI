@@ -27,8 +27,7 @@ jobs:
       - name: Run Ruff with auto-fix
         run: |
           pip install ruff
-          # Apply safe and unsafe fixes
-          ruff check src --fix --unsafe-fixes
+          make format
           git add .
           git commit -m "Apply pre-commit fixes" || echo "No changes to commit"
           git push
