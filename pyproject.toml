@@ -46,7 +46,7 @@ dependencies = [
     "sentence-transformers==3.0.1",
     "torch==2.4.0",
     "tiktoken==0.8.0",
-    "unstructured==0.16.23",
+    "unstructured==0.21.5",
     "unstructured-client==0.31.0",
     "webcolors==24.6.0",
     "nest-asyncio==1.6.0",
