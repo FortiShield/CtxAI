@@ -1,14 +1,14 @@
 # Working with Projects
 
-Projects are one of Ctx AI's most powerful features for organizing your work. They create isolated workspaces with dedicated context, instructions, memory, and secrets - preventing context bleed between unrelated tasks or clients.
+Projects are one of CtxAI's most powerful features for organizing your work. They create isolated workspaces with dedicated context, instructions, memory, and secrets - preventing context bleed between unrelated tasks or clients.
 
 This tutorial will guide you through creating, configuring, and using projects effectively.
 
 ## What Are Projects?
 
-A project in Ctx AI is an isolated workspace that includes:
+A project in CtxAI is an isolated workspace that includes:
 
-- **Dedicated folder structure** under `/ctx/usr/projects/<project_name>/`
+- **Dedicated folder structure** under `/ctx0/usr/projects/<project_name>/`
 - **Custom instructions** automatically injected into the agent's system prompt
 - **Isolated or shared memory** to prevent context pollution
 - **Project-specific secrets and variables** for secure credential management
@@ -55,18 +55,18 @@ The wizard includes:
 
 ### Creating a Git-Based Project
 
-Ctx AI's **Git Projects** feature allows you to clone repositories directly into your project workspace:
+CtxAI's **Git Projects** feature allows you to clone repositories directly into your project workspace:
 
 1. In the creation form, enter a Git repository URL in the **Git Repository** field
    - Supports both public and private repositories
    - For private repositories, you can provide an authentication token
 2. Click **"Create and continue"**
-3. Ctx AI will clone the repository
+3. CtxAI will clone the repository
 
 ![Git Clone Progress](../res/usage/projects/projects-gitprojects-clone.png)
 
 The cloning process:
-- Downloads the repository to `/ctx/usr/projects/<project_name>/`
+- Downloads the repository to `/ctx0/usr/projects/<project_name>/`
 - By default, clones the `main` branch
 - Supports authentication via token (stored securely, never in URLs)
 - You can ask the agent to checkout different branches later
@@ -80,7 +80,7 @@ After cloning completes, you'll see:
 - Last commit information
 
 > [!NOTE]
-> If the cloned repository already contains a `.ctxproj/` folder with `project.json`, Ctx AI will merge the existing configuration with your specified title and color preferences.
+> If the cloned repository already contains a `.ctx0proj/` folder with `project.json`, CtxAI will merge the existing configuration with your specified title and color preferences.
 
 ## Project Configuration
 
@@ -166,7 +166,7 @@ with precision and business acumen.
 
 ### Additional Instruction Files
 
-Besides the main instructions field, you can add multiple instruction files in the `.ctxproj/instructions/` directory. These are automatically loaded and concatenated with the main instructions.
+Besides the main instructions field, you can add multiple instruction files in the `.ctx0proj/instructions/` directory. These are automatically loaded and concatenated with the main instructions.
 
 This is useful for:
 - Organizing complex instructions into logical sections
@@ -178,14 +178,7 @@ This is useful for:
 Projects support two memory modes:
 
 - **Own memory** (default): The project has its own isolated memory directory
-  - Memories stored under `vector_db/projects/<project_name>/`
-  - Prevents context bleed between projects
-  - Ideal for client work, sensitive projects, or distinct domains
-  
 - **Global memory**: The project shares the default memory pool
-  - Memories stored under `vector_db/default/`
-  - Useful when projects need shared knowledge
-  - Better for related projects in the same domain
 
 > [!TIP]
 > Use **own memory** for:
@@ -203,7 +196,7 @@ Projects support two memory modes:
 Projects support scoped configuration values:
 
 #### Variables (Non-sensitive)
-Stored in `.ctxproj/variables.env`:
+Stored in `.ctx0proj/variables.env`:
 ```bash
 API_BASE_URL=https://api.example.com
 DEFAULT_TIMEOUT=30
@@ -212,7 +205,7 @@ LOG_LEVEL=info
 ```
 
 #### Secrets (Sensitive)
-Stored in `.ctxproj/secrets.env`:
+Stored in `.ctx0proj/secrets.env`:
 ```bash
 API_KEY=sk-abc123xyz...
 DATABASE_PASSWORD=super_secret_pwd
@@ -228,13 +221,13 @@ SMTP_PASSWORD=email_pwd_here
 
 ### Subagent Configuration
 
-Projects can enable or disable specific subagents (like the Browser Agent). This is configured via the UI and stored in `.ctxproj/agents.json`.
+Projects can enable or disable specific subagents. This is configured via the UI and stored in `.ctx0proj/agents.json`. The Browser Agent is not a subagent; it is a built-in plugin.
 
 ### Knowledge Files
 
 Import project-specific knowledge documents:
 1. Use the **Import Knowledge** button in the project interface
-2. Files are stored in `.ctxproj/knowledge/` organized by memory area
+2. Files are stored in `.ctx0proj/knowledge/` organized by memory area
 3. The agent can reference this knowledge when the project is active
 
 ### File Structure Injection
@@ -251,7 +244,7 @@ Projects can automatically inject their directory structure into the agent's con
 
 The default gitignore for projects excludes:
 ```
-.ctxproj/
+.ctx0proj/
 venv/
 __pycache__/
 node_modules/
@@ -266,7 +259,7 @@ This feature is incredibly useful for code projects - the agent automatically "s
 To use a project, you need to activate it for your current chat:
 
 ### In a New Chat
-1. Create or select a project from the Projects modal
+1. Activate a project from the Projects modal or dropdown
 2. Start a new chat
 3. The project is automatically active for that chat
 
@@ -295,7 +288,7 @@ The agent now:
 
 **Example prompt after activation:**
 ```
-Hi CTX. Start first development phase:
+Hi CTX0. Start first development phase:
 - recon
 - scope definition
 - AGENTS.md generation
@@ -308,8 +301,8 @@ The agent will understand the context based on the project's instructions and wo
 Understanding the project directory structure helps you work effectively:
 
 ```
-/ctx/usr/projects/<project_name>/
-├── .ctxproj/                    # Project metadata (hidden)
+/ctx0/usr/projects/<project_name>/
+├── .ctx0proj/                    # Project metadata (hidden)
 │   ├── project.json            # Main configuration
 │   ├── variables.env           # Non-sensitive variables
 │   ├── secrets.env             # Sensitive credentials
@@ -329,7 +322,7 @@ Understanding the project directory structure helps you work effectively:
 ```
 
 > [!TIP]
-> The `.ctxproj/` folder is automatically excluded from file structure injection (via gitignore patterns) to keep the agent's context clean.
+> The `.ctx0proj/` folder is automatically excluded from file structure injection (via gitignore patterns) to keep the agent's context clean.
 
 ## Advanced Use Cases
 
@@ -381,7 +374,7 @@ Each with domain-specific:
 
 ## Combining Projects with Tasks
 
-Projects work exceptionally well with Ctx AI's **Tasks & Scheduling** feature:
+Projects work exceptionally well with CtxAI's **Tasks & Scheduling** feature:
 
 1. Create a project for a specific domain (e.g., "Daily Email Reports")
 2. Configure project instructions for the recurring task
@@ -412,7 +405,7 @@ See [Tasks & Scheduling](usage.md#tasks--scheduling) for more details.
 - Clear memory when archiving completed projects
 
 ### Security
-- Never commit `.ctxproj/secrets.env` to version control
+- Never commit `.ctx0proj/secrets.env` to version control
 - Use project-scoped secrets instead of global secrets for sensitive work
 - Consider separate projects for different security levels
 - Backup secrets manually - they may not be included in automatic backups

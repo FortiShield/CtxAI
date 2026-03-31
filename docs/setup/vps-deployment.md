@@ -1,6 +1,6 @@
-# Ctx AI Installation Guide
+# CtxAI Installation Guide
 
-> **Purpose:** Step-by-step guide for deploying Ctx AI instances on VPS/dedicated servers  
+> **Purpose:** Step-by-step guide for deploying CtxAI instances on VPS/dedicated servers  
 > **Author:** Auto-generated from deployment experience  
 > **Last Updated:** December 21 2025  
 > **Compatibility:** Docker-capable Linux servers (AlmaLinux, CentOS, Rocky, Ubuntu, Debian)
@@ -11,7 +11,7 @@
 
 1. [Prerequisites](#prerequisites)
 2. [Docker Installation](#docker-installation)
-3. [Ctx AI Container Deployment](#ctxai-container-deployment)
+3. [CtxAI Container Deployment](#ctxai-container-deployment)
 4. [Apache Reverse Proxy Configuration](#apache-reverse-proxy-configuration)
 5. [SSL/TLS Configuration](#ssltls-configuration)
 6. [Authentication Setup](#authentication-setup)
@@ -118,34 +118,34 @@ docker run hello-world
 
 ---
 
-## Ctx AI Container Deployment
+## CtxAI Container Deployment
 
 ### Step 1: Create Directory Structure
 
 ```bash
 # Choose your installation path
-CTX_NAME="ctx-instance"  # Change this to your instance name
-CTX_PATH="/opt/${CTX_NAME}"
+CTX0_NAME="ctx0-instance"  # Change this to your instance name
+CTX0_PATH="/opt/${CTX0_NAME}"
 
 # Create directories
-mkdir -p ${CTX_PATH}
-mkdir -p ${CTX_PATH}/work_dir
-mkdir -p ${CTX_PATH}/memory
-mkdir -p ${CTX_PATH}/logs
+mkdir -p ${CTX0_PATH}
+mkdir -p ${CTX0_PATH}/work_dir
+mkdir -p ${CTX0_PATH}/memory
+mkdir -p ${CTX0_PATH}/logs
 ```
 
 ### Step 2: Create Environment Configuration
 
 ```bash
 # Create .env file with authentication
-cat > ${CTX_PATH}/.env << 'EOF'
-# Ctx AI Configuration
+cat > ${CTX0_PATH}/.env << 'EOF'
+# CtxAI Configuration
 # Authentication (REQUIRED for web access)
 AUTH_LOGIN=your_username_here
 AUTH_PASSWORD=your_secure_password_here
 
 # Optional: Additional configuration
-# See Ctx AI documentation for all options
+# See CtxAI documentation for all options
 EOF
 ```
 
@@ -165,28 +165,28 @@ EOF
 
 ```bash
 # Set variables
-CTX_NAME="ctx-instance"
-CTX_PATH="/opt/${CTX_NAME}"
-CTX_PORT="50080"
+CTX0_NAME="ctx0-instance"
+CTX0_PATH="/opt/${CTX0_NAME}"
+CTX0_PORT="50080"
 
 # Pull latest image
 docker pull ctxos/ctxai:latest
 
 # Run container
-docker run -d   --name ${CTX_NAME}   --restart unless-stopped   -p ${CTX_PORT}:80   -v ${CTX_PATH}/.env:/ctx/.env   -v ${CTX_PATH}/usr:/ctx/usr   ctxos/ctxai:latest
+docker run -d   --name ${CTX0_NAME}   --restart unless-stopped   -p ${CTX0_PORT}:80   -v ${CTX0_PATH}/.env:/ctx0/.env   -v ${CTX0_PATH}/usr:/ctx0/usr   ctxos/ctxai:latest
 ```
 
 ### Step 5: Verify Container
 
 ```bash
 # Check container is running
-docker ps | grep ${CTX_NAME}
+docker ps | grep ${CTX0_NAME}
 
 # Check logs
-docker logs ${CTX_NAME}
+docker logs ${CTX0_NAME}
 
 # Test local access
-curl -I http://127.0.0.1:${CTX_PORT}/
+curl -I http://127.0.0.1:${CTX0_PORT}/
 ```
 
 Expected response: `HTTP/1.1 302 FOUND` with `Location: /login` (if auth enabled)
@@ -208,17 +208,17 @@ httpd -M | grep -E "proxy|rewrite|ssl"
 
 ### Configuration for Standard Apache (Debian/Ubuntu)
 
-Create `/etc/apache2/sites-available/ctx-instance.conf`:
+Create `/etc/apache2/sites-available/ctx0-instance.conf`:
 
 ```apache
-# Ctx AI Reverse Proxy Configuration
-# Instance: ctx-instance
-# Domain: ctx.example.com
+# CtxAI Reverse Proxy Configuration
+# Instance: ctx0-instance
+# Domain: a0.example.com
 
 # HTTP - Redirect to HTTPS
 <VirtualHost *:80>
-    ServerName ctx.example.com
-    ServerAlias www.ctx.example.com
+    ServerName a0.example.com
+    ServerAlias www.ctx0.example.com
 
     RewriteEngine On
     RewriteCond %{HTTPS} off
@@ -227,8 +227,8 @@ Create `/etc/apache2/sites-available/ctx-instance.conf`:
 
 # HTTPS - Proxy to Container
 <VirtualHost *:443>
-    ServerName ctx.example.com
-    ServerAlias www.ctx.example.com
+    ServerName a0.example.com
+    ServerAlias www.ctx0.example.com
     ServerAdmin webmaster@example.com
 
     # SSL Configuration
@@ -249,15 +249,15 @@ Create `/etc/apache2/sites-available/ctx-instance.conf`:
     RewriteRule ^/?(.*) ws://127.0.0.1:50080/$1 [P,L]
 
     # Logging
-    ErrorLog ${APACHE_LOG_DIR}/ctx-instance.error.log
-    CustomLog ${APACHE_LOG_DIR}/ctx-instance.access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/ctx0-instance.error.log
+    CustomLog ${APACHE_LOG_DIR}/ctx0-instance.access.log combined
 </VirtualHost>
 ```
 
 Enable and restart:
 
 ```bash
-a2ensite ctx-instance.conf
+a2ensite ctx0-instance.conf
 apache2ctl configtest
 systemctl reload apache2
 ```
@@ -269,14 +269,14 @@ systemctl reload apache2
 Edit `/etc/httpd/conf/extra/httpd-includes.conf`:
 
 ```apache
-# Ctx AI Proxy Configuration
-# Instance: ctx-instance
-# Domain: ctx.example.com
+# CtxAI Proxy Configuration
+# Instance: ctx0-instance
+# Domain: a0.example.com
 # Note: Use specific IP, not wildcards, for DirectAdmin compatibility
 
 <VirtualHost YOUR_SERVER_IP:80>
-    ServerName ctx.example.com
-    ServerAlias www.ctx.example.com
+    ServerName a0.example.com
+    ServerAlias www.ctx0.example.com
 
     RewriteEngine On
     RewriteCond %{HTTPS} off
@@ -284,8 +284,8 @@ Edit `/etc/httpd/conf/extra/httpd-includes.conf`:
 </VirtualHost>
 
 <VirtualHost YOUR_SERVER_IP:443>
-    ServerName ctx.example.com
-    ServerAlias www.ctx.example.com
+    ServerName a0.example.com
+    ServerAlias www.ctx0.example.com
     ServerAdmin webmaster@example.com
 
     SSLEngine on
@@ -303,8 +303,8 @@ Edit `/etc/httpd/conf/extra/httpd-includes.conf`:
     RewriteCond %{HTTP:Connection} upgrade [NC]
     RewriteRule ^/?(.*) ws://127.0.0.1:50080/$1 [P,L]
 
-    ErrorLog /var/log/httpd/domains/ctx.example.com.error.log
-    CustomLog /var/log/httpd/domains/ctx.example.com.access.log combined
+    ErrorLog /var/log/httpd/domains/ctx0.example.com.error.log
+    CustomLog /var/log/httpd/domains/ctx0.example.com.access.log combined
 </VirtualHost>
 ```
 
@@ -326,7 +326,7 @@ sed -i '/Include conf\/extra\/directadmin-vhosts.conf/i Include conf.d/*.conf' /
 
 # Create config
 mkdir -p /etc/httpd/conf.d
-cat > /etc/httpd/conf.d/httpd-vhosts-ctx.conf << 'EOF'
+cat > /etc/httpd/conf.d/httpd-vhosts-ctx0.conf << 'EOF'
 # Your vhost config here (same as Option A)
 EOF
 ```
@@ -359,7 +359,7 @@ apt-get install certbot python3-certbot-apache
 dnf install certbot python3-certbot-apache
 
 # Obtain certificate
-certbot --apache -d ctx.example.com -d www.ctx.example.com
+certbot --apache -d a0.example.com -d www.ctx0.example.com
 
 # Auto-renewal (usually automatic, but verify)
 certbot renew --dry-run
@@ -379,22 +379,22 @@ If using DirectAdmin, SSL is typically managed automatically:
 Place certificates in secure location:
 
 ```bash
-mkdir -p /etc/ssl/ctx
-chmod 700 /etc/ssl/ctx
+mkdir -p /etc/ssl/ctx0
+chmod 700 /etc/ssl/ctx0
 
 # Copy your certificates
-cp certificate.crt /etc/ssl/ctx/
-cp private.key /etc/ssl/ctx/
-cp chain.crt /etc/ssl/ctx/  # if applicable
+cp certificate.crt /etc/ssl/ctx0/
+cp private.key /etc/ssl/ctx0/
+cp chain.crt /etc/ssl/ctx0/  # if applicable
 
-chmod 600 /etc/ssl/ctx/*
+chmod 600 /etc/ssl/ctx0/*
 ```
 
 ---
 
 ## Authentication Setup
 
-### Understanding CTX Authentication Variables
+### Understanding CTX0 Authentication Variables
 
 | Variable | Purpose | Example |
 |----------|---------|--------|
@@ -407,14 +407,14 @@ chmod 600 /etc/ssl/ctx/*
 
 ```bash
 # Edit .env file
-vi /opt/ctx-instance/.env
+vi /opt/ctx0-instance/.env
 
 # Add/update these lines:
 AUTH_LOGIN=your_username
 AUTH_PASSWORD=your_secure_password
 
 # Restart container to apply
-docker restart ctx-instance
+docker restart ctx0-instance
 ```
 
 ### Password Requirements
@@ -432,7 +432,7 @@ To disable authentication (local/dev use only):
 # AUTH_LOGIN=
 # AUTH_PASSWORD=
 
-docker restart ctx-instance
+docker restart ctx0-instance
 ```
 
 ---
@@ -445,22 +445,22 @@ Create an A record pointing to your server:
 
 | Type | Name | Value | TTL |
 |------|------|-------|-----|
-| A | ctx | YOUR_SERVER_IP | 300 |
-| A | www.ctx | YOUR_SERVER_IP | 300 |
+| A | a0 | YOUR_SERVER_IP | 300 |
+| A | www.ctx0 | YOUR_SERVER_IP | 300 |
 
 ### DirectAdmin Subdomain Setup
 
 1. Log into DirectAdmin
 2. Navigate to: **Domain Setup** → Select domain → **Subdomain Management**
-3. Create subdomain (e.g., `ctx`)
+3. Create subdomain (e.g., `ctx0`)
 4. Note: You'll override the DocumentRoot with Apache proxy config
 
 ### Verify DNS Propagation
 
 ```bash
 # Check DNS resolution
-dig ctx.example.com +short
-nslookup ctx.example.com
+dig a0.example.com +short
+nslookup a0.example.com
 
 # Should return your server IP
 ```
@@ -473,10 +473,10 @@ nslookup ctx.example.com
 
 ```bash
 # 1. Verify Docker container is running
-docker ps | grep ctx-instance
+docker ps | grep ctx0-instance
 
 # 2. Check container logs for errors
-docker logs ctx-instance --tail 50
+docker logs ctx0-instance --tail 50
 
 # 3. Test local container access
 curl -I http://127.0.0.1:50080/
@@ -486,16 +486,16 @@ curl -I http://127.0.0.1:50080/
 httpd -t   # or apache2ctl -t
 
 # 5. Check Apache is proxying correctly
-curl -I http://127.0.0.1:80 -H "Host: ctx.example.com"
-curl -Ik https://127.0.0.1:443 -H "Host: ctx.example.com"
+curl -I http://127.0.0.1:80 -H "Host: a0.example.com"
+curl -Ik https://127.0.0.1:443 -H "Host: a0.example.com"
 
 # 6. Test external HTTPS access
-curl -I https://ctx.example.com/
+curl -I https://ctx0.example.com/
 # Expected: HTTP/2 302 with Location: /login
 
 # 7. Test login page loads
-curl -s https://ctx.example.com/login | grep -i "<title>"
-# Expected: <title>Login - Ctx AI</title>
+curl -s https://ctx0.example.com/login | grep -i "<title>"
+# Expected: <title>Login - CtxAI</title>
 ```
 
 ### WebSocket Verification
@@ -505,7 +505,7 @@ curl -s https://ctx.example.com/login | grep -i "<title>"
 npm install -g wscat
 
 # Test WebSocket connection
-wscat -c wss://ctx.example.com/ws
+wscat -c wss://ctx0.example.com/ws
 ```
 
 ---
@@ -519,14 +519,14 @@ wscat -c wss://ctx.example.com/ws
 **Fix:**
 ```bash
 # Verify .env inside container
-docker exec ctx-instance cat /ctx/.env
+docker exec ctx0-instance cat /ctx0/.env
 
 # Ensure format is:
 # AUTH_LOGIN=username  (NOT AUTH_LOGIN=true)
 # AUTH_PASSWORD=password
 
 # Restart after fixing
-docker restart ctx-instance
+docker restart ctx0-instance
 ```
 
 ### Issue: 403 Forbidden
@@ -552,13 +552,13 @@ systemctl restart httpd
 **Fix:**
 ```bash
 # Check container status
-docker ps -a | grep ctx-instance
+docker ps -a | grep ctx0-instance
 
 # If stopped, check logs
-docker logs ctx-instance
+docker logs ctx0-instance
 
 # Restart container
-docker start ctx-instance
+docker start ctx0-instance
 
 # Verify port binding
 netstat -tlnp | grep 50080
@@ -571,10 +571,10 @@ netstat -tlnp | grep 50080
 **Fix:**
 ```bash
 # Check container resource usage
-docker stats ctx-instance --no-stream
+docker stats ctx0-instance --no-stream
 
 # Restart container
-docker restart ctx-instance
+docker restart ctx0-instance
 
 # Check for memory issues
 free -h
@@ -617,40 +617,40 @@ journalctl -u docker --since "1 hour ago"
 
 **Fix:**
 ```bash
-docker restart ctx-instance
+docker restart ctx0-instance
 
 # Verify env is loaded
-docker exec ctx-instance cat /ctx/.env
+docker exec ctx0-instance cat /ctx0/.env
 ```
 
 ---
 
 ## Maintenance & Updates
 
-### Updating Ctx AI
+### Updating CtxAI
 
 ```bash
 # Pull latest image
 docker pull ctxos/ctxai:latest
 
 # Stop and remove old container (data persists in volumes)
-docker stop ctx-instance
-docker rm ctx-instance
+docker stop ctx0-instance
+docker rm ctx0-instance
 
 # Recreate with same settings
-docker run -d   --name ctx-instance   --restart unless-stopped   -p 50080:80   -v /opt/ctx-instance/.env:/ctx/.env   -v /opt/ctx-instance/usr:/ctx/usr   -v /opt/ctxai:latest
+docker run -d   --name ctx0-instance   --restart unless-stopped   -p 50080:80   -v /opt/ctx0-instance/.env:/ctx0/.env   -v /opt/ctx0-instance/usr:/ctx0/usr   -v /opt/ctxai:latest
 ```
 
 ### Backup Strategy
 
 ```bash
 # Backup all instance data
-tar -czvf ctx-backup-$(date +%Y%m%d).tar.gz /opt/ctx-instance/
+tar -czvf ctx0-backup-$(date +%Y%m%d).tar.gz /opt/ctx0-instance/
 
 # Key items to backup:
-# - /opt/ctx-instance/.env (configuration)
-# - /opt/ctx-instance/memory/ (agent memories)
-# - /opt/ctx-instance/work_dir/ (working files)
+# - /opt/ctx0-instance/.env (configuration)
+# - /opt/ctx0-instance/memory/ (agent memories)
+# - /opt/ctx0-instance/work_dir/ (working files)
 ```
 
 ### Monitoring
@@ -660,10 +660,10 @@ tar -czvf ctx-backup-$(date +%Y%m%d).tar.gz /opt/ctx-instance/
 docker ps --format "table {{.Names}}	{{.Status}}	{{.Ports}}"
 
 # View recent logs
-docker logs --tail 100 -f ctx-instance
+docker logs --tail 100 -f ctx0-instance
 
 # Resource usage
-docker stats ctx-instance
+docker stats ctx0-instance
 ```
 
 ### Docker Cleanup
@@ -684,11 +684,11 @@ docker system prune -f
 
 ```bash
 # Container Management
-docker start ctx-instance
-docker stop ctx-instance
-docker restart ctx-instance
-docker logs ctx-instance
-docker exec -it ctx-instance bash
+docker start ctx0-instance
+docker stop ctx0-instance
+docker restart ctx0-instance
+docker logs ctx0-instance
+docker exec -it ctx0-instance bash
 
 # Apache Management  
 systemctl restart httpd    # RHEL/AlmaLinux
@@ -696,7 +696,7 @@ systemctl restart apache2  # Debian/Ubuntu
 httpd -t                   # Test config
 
 # Quick Diagnostics
-docker ps | grep ctx
+docker ps | grep a0
 curl -I https://your-domain.com/login
 ```
 
@@ -704,11 +704,11 @@ curl -I https://your-domain.com/login
 
 | Component | Path |
 |-----------|----- |
-| Instance Data | `/opt/ctx-instance/` |
-| Environment File | `/opt/ctx-instance/.env` |
-| Memory Storage | `/opt/ctx-instance/memory/` |
-| Work Directory | `/opt/ctx-instance/work_dir/` |
-| Logs | `/opt/ctx-instance/logs/` |
+| Instance Data | `/opt/ctx0-instance/` |
+| Environment File | `/opt/ctx0-instance/.env` |
+| Memory Storage | `/opt/ctx0-instance/memory/` |
+| Work Directory | `/opt/ctx0-instance/work_dir/` |
+| Logs | `/opt/ctx0-instance/logs/` |
 | Apache Config (Standard) | `/etc/apache2/sites-available/` |
 | Apache Config (DirectAdmin) | `/etc/httpd/conf/extra/httpd-includes.conf` |
 | DirectAdmin SSL Certs | `/usr/local/directadmin/data/users/USER/domains/` |
@@ -717,16 +717,16 @@ curl -I https://your-domain.com/login
 
 | Port | Purpose |
 |------|---------|
-| 50080 | First CTX instance |
-| 50081 | Second CTX instance |
-| 50082 | Third CTX instance |
+| 50080 | First CTX0 instance |
+| 50081 | Second CTX0 instance |
+| 50082 | Third CTX0 instance |
 | 80 | HTTP (redirect to HTTPS) |
 | 443 | HTTPS (main access) |
 
 ### .env Template
 
 ```bash
-# Ctx AI Configuration Template
+# CtxAI Configuration Template
 # Copy and customize for each instance
 
 # Authentication (REQUIRED for production)
@@ -734,26 +734,26 @@ AUTH_LOGIN=your_username
 AUTH_PASSWORD=your_secure_password
 
 # Optional: Additional settings
-# Refer to Ctx AI documentation for all options
+# Refer to CtxAI documentation for all options
 ```
 
 ---
 
 ## Appendix: Multi-Instance Setup
 
-For running multiple CTX instances on the same server:
+For running multiple CTX0 instances on the same server:
 
 ```bash
-# Instance 1: ctx-primary on port 50080
-mkdir -p /opt/ctx-primary
+# Instance 1: ctx0-primary on port 50080
+mkdir -p /opt/ctx0-primary
 # ... create .env, run container on port 50080
 
-# Instance 2: ctx-dev on port 50081  
-mkdir -p /opt/ctx-dev
+# Instance 2: ctx0-dev on port 50081  
+mkdir -p /opt/ctx0-dev
 # ... create .env, run container on port 50081
 
-# Instance 3: ctx-backup on port 50082
-mkdir -p /opt/ctx-backup
+# Instance 3: ctx0-backup on port 50082
+mkdir -p /opt/ctx0-backup
 # ... create .env, run container on port 50082
 ```
 
@@ -766,6 +766,6 @@ Each instance needs:
 
 ---
 
-*This guide comes from successful Ctx AI deployments across DirectAdmin and standard Linux environments.*
+*This guide comes from successful CtxAI deployments across DirectAdmin and standard Linux environments.*
 
-Contributed by @hurtdidit in the CTX Community.
+Contributed by @hurtdidit in the CTX0 Community.

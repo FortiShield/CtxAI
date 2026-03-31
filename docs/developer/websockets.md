@@ -1,6 +1,6 @@
 # WebSocket Infrastructure Guide
 
-This guide consolidates everything you need to design, implement, and troubleshoot Ctx AI WebSocket flows. It complements the feature specification by describing day-to-day developer tasks, showing how backend handlers and frontend clients cooperate, and documenting practical patterns for producers and consumers on both sides of the connection.
+This guide consolidates everything you need to design, implement, and troubleshoot CtxAI WebSocket flows. It complements the feature specification by describing day-to-day developer tasks, showing how backend handlers and frontend clients cooperate, and documenting practical patterns for producers and consumers on both sides of the connection.
 
 ---
 
@@ -60,7 +60,7 @@ Useful mental model: **client ↔ manager ↔ handler**. The manager normalises 
 
 ### State Sync (Replacing `/poll`)
 
-Ctx AI can also push poll-shaped state snapshots over the WebSocket bus, replacing the legacy 4Hz `/poll` loop while preserving the existing UI update contract.
+CtxAI can also push poll-shaped state snapshots over the WebSocket bus, replacing the legacy 4Hz `/poll` loop while preserving the existing UI update contract.
 
 - **Handshake**: the frontend sync store (`/components/sync/sync-store.js`) calls `websocket.request("state_request", { context, log_from, notifications_from, timezone })` to establish per-tab cursors and a `seq_base`.
 - **Push**: the server emits `state_push` events containing `{ runtime_epoch, seq, snapshot }`, where `snapshot` is exactly the `/poll` payload shape built by `python/helpers/state_snapshot.py`.
@@ -139,7 +139,7 @@ These expanded flows complement the operation matrix later in the guide, ensurin
 
 Handlers are discovered deterministically from `python/websocket_handlers/`:
 
-- **File entry**: `python/websocket_handlers/state_sync_handler.py` → namespace `/state_sync`
+- **File entry**: `python/websocket_handlers/webui_handler.py` → namespace `/webui`
 - **Folder entry**: `python/websocket_handlers/orders/` or `python/websocket_handlers/orders_handler/` → namespace `/orders` (loads `*.py` one level deep; ignores `__init__.py` and deeper nesting)
 - **Reserved root**: `python/websocket_handlers/_default.py` → namespace `/` (diagnostics-only by default)
 
@@ -273,7 +273,7 @@ console.log(window.runtimeInfo.id, window.runtimeInfo.isDevelopment);
 
 ### Namespaces (end-state)
 
-- The root namespace (`/`) is reserved and intentionally unhandled by default for application events. Feature code should connect to an explicit namespace (for example `/state_sync`).
+- The root namespace (`/`) is reserved and intentionally unhandled by default for application events. Feature code should connect to an explicit namespace (for example `/webui`).
 - The frontend exposes `createNamespacedClient(namespace)` and `getNamespacedClient(namespace)` (one client instance per namespace per tab). Namespaced clients expose the same minimal API: `emit`, `request`, `on`, `off`.
 - Unknown namespaces are rejected deterministically during the Socket.IO connect handshake with a `connect_error` payload:
   - `err.message === "UNKNOWN_NAMESPACE"`
@@ -342,7 +342,7 @@ Example:
 ```javascript
 import { getNamespacedClient, createCorrelationId, validateServerEnvelope } from '/js/websocket.js';
 
-const websocket = getNamespacedClient('/state_sync');
+const websocket = getNamespacedClient('/webui');
 
 const { results } = await websocket.request(
   'hello_request',
@@ -381,7 +381,7 @@ Example – request()
 ```javascript
 import { getNamespacedClient } from '/js/websocket.js'
 
-const websocket = getNamespacedClient('/state_sync')
+const websocket = getNamespacedClient('/webui')
 
 function renderError(code, message) {
   // Map codes to UI copy; keep messages concise
@@ -409,7 +409,7 @@ Subscriptions – envelope handler
 ```javascript
 import { getNamespacedClient } from '/js/websocket.js'
 
-const websocket = getNamespacedClient('/state_sync')
+const websocket = getNamespacedClient('/webui')
 
 websocket.on('example_broadcast', ({ data, handlerId, eventId, correlationId }) => {
   // handle data; errors should not typically arrive via broadcast

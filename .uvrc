@@ -1,0 +1,11 @@
+# UV configuration for CtxAI
+# This file helps UV handle platform-specific dependencies
+
+[tool.uv]
+# Skip problematic packages on macOS x86_64
+# These packages have compatibility issues with the current platform
+skip-dependencies = [
+    "torch",
+    "sentence-transformers",
+    "faiss-cpu",
+]
