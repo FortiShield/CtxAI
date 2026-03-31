@@ -53,13 +53,9 @@ class SchedulerTaskCreate(ApiHandler):
         schedule = input.get("schedule", {})
         token: str = input.get("token", "")
 
-        # Debug log the token value
-        printer.print(f"Token received from frontend: '{token}' (type: {type(token)}, length: {len(token) if token else 0})")
-
         # Generate a random token if empty or not provided
         if not token:
             token = str(random.randint(1000000000000000000, 9999999999999999999))
-            printer.print(f"Generated new token: '{token}'")
 
         plan = input.get("plan", {})
 
@@ -122,7 +118,6 @@ class SchedulerTaskCreate(ApiHandler):
             )
         else:
             # Create an ad-hoc task
-            printer.print(f"Creating AdHocTask with token: '{token}'")
             task = AdHocTask.create(
                 name=name,
                 system_prompt=system_prompt,
@@ -133,29 +128,12 @@ class SchedulerTaskCreate(ApiHandler):
                 project_name=project_slug,
                 project_color=project_color,
             )
-            # Verify token after creation
-            if isinstance(task, AdHocTask):
-                printer.print(f"AdHocTask created with token: '{task.token}'")
 
         # Add the task to the scheduler
         await scheduler.add_task(task)
 
-        # Verify the task was added correctly - retrieve by UUID to check persistence
-        saved_task = scheduler.get_task_by_uuid(task.uuid)
-        if saved_task:
-            if saved_task.type == TaskType.AD_HOC and isinstance(saved_task, AdHocTask):
-                printer.print(f"Task verified after save, token: '{saved_task.token}'")
-            else:
-                printer.print("Task verified after save, not an adhoc task")
-        else:
-            printer.print("WARNING: Task not found after save!")
-
         # Return the created task using our standardized serialization function
         task_dict = serialize_task(task)
-
-        # Debug log the serialized task
-        if task_dict and task_dict.get('type') == 'adhoc':
-            printer.print(f"Serialized adhoc task, token in response: '{task_dict.get('token')}'")
 
         return {
             "ok": True,

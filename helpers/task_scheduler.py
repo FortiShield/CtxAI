@@ -512,33 +512,47 @@ class SchedulerTaskList(BaseModel):
     ] = Field(default_factory=list)
     # Singleton instance
     __instance: ClassVar[Optional["SchedulerTaskList"]] = PrivateAttr(default=None)
+    _singleton_lock: ClassVar[threading.Lock] = threading.Lock()
 
     # lock: threading.Lock = Field(exclude=True, default=threading.Lock())
 
     @classmethod
     def get(cls) -> "SchedulerTaskList":
-        path = get_abs_path(SCHEDULER_FOLDER, "tasks.json")
-        if cls.__instance is None:
-            if not exists(path):
-                make_dirs(path)
-                cls.__instance = asyncio.run(cls(tasks=[]).save())
+        with cls._singleton_lock:
+            if cls.__instance is None:
+                path = get_abs_path(SCHEDULER_FOLDER, "tasks.json")
+                if not exists(path):
+                    make_dirs(path)
+                    cls.__instance = cls(tasks=[])
+                    cls.__instance.save_sync()
+                else:
+                    try:
+                        cls.__instance = cls.model_validate_json(read_file(path))
+                    except Exception as e:
+                        PrintStyle.error(f"Failed to load scheduler tasks: {e}")
+                        cls.__instance = cls(tasks=[])
             else:
-                cls.__instance = cls.model_validate_json(read_file(path))
-        else:
-            asyncio.run(cls.__instance.reload())
-        return cls.__instance
+                cls.__instance.reload_sync()
+            return cls.__instance
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._lock = threading.RLock()
 
     async def reload(self) -> "SchedulerTaskList":
+        self.reload_sync()
+        return self
+
+    def reload_sync(self) -> "SchedulerTaskList":
         path = get_abs_path(SCHEDULER_FOLDER, "tasks.json")
         if exists(path):
             with self._lock:
-                data = self.__class__.model_validate_json(read_file(path))
-                self.tasks.clear()
-                self.tasks.extend(data.tasks)
+                try:
+                    data = self.__class__.model_validate_json(read_file(path))
+                    self.tasks.clear()
+                    self.tasks.extend(data.tasks)
+                except Exception as e:
+                    PrintStyle.error(f"Failed to reload scheduler tasks: {e}")
         return self
 
     async def add_task(
@@ -550,20 +564,18 @@ class SchedulerTaskList(BaseModel):
         return self
 
     async def save(self) -> "SchedulerTaskList":
+        self.save_sync()
+        return self
+
+    def save_sync(self) -> "SchedulerTaskList":
         with self._lock:
             # Debug: check for AdHocTasks with null tokens before saving
             for task in self.tasks:
                 if isinstance(task, AdHocTask):
                     if task.token is None or task.token == "":
-                        PrintStyle.warning(
-                            f"WARNING: AdHocTask {task.name} ({task.uuid}) has a null or empty token before saving: '{task.token}'"
-                        )
                         # Generate a new token to prevent errors
                         task.token = str(
                             random.randint(1000000000000000000, 9999999999999999999)
-                        )
-                        PrintStyle.info(
-                            f"Fixed: Generated new token '{task.token}' for task {task.name}"
                         )
 
             path = get_abs_path(SCHEDULER_FOLDER, "tasks.json")
@@ -572,22 +584,7 @@ class SchedulerTaskList(BaseModel):
 
             # Get the JSON string before writing
             json_data = self.model_dump_json()
-
-            # Debug: check if 'null' appears as token value in JSON
-            if '"type": "adhoc"' in json_data and '"token": null' in json_data:
-                PrintStyle.error(
-                    "ERROR: Found null token in JSON output for an adhoc task"
-                )
-
             write_file(path, json_data)
-
-            # Debug: Verify after saving
-            if exists(path):
-                loaded_json = read_file(path)
-                if '"type": "adhoc"' in loaded_json and '"token": null' in loaded_json:
-                    PrintStyle.error(
-                        "ERROR: Null token persisted in JSON file for an adhoc task"
-                    )
 
         return self
 
