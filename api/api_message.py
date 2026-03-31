@@ -53,7 +53,7 @@ class ApiMessage(ApiHandler):
         # Handle attachments (base64 encoded)
         attachment_paths = []
         if attachments:
-             upload_folder_int = "/ctx0/usr/uploads"
+            upload_folder_int = "/ctx0/usr/uploads"
             upload_folder_ext = files.get_abs_path("usr/uploads")
             os.makedirs(upload_folder_ext, exist_ok=True)
 
@@ -119,7 +119,7 @@ class ApiMessage(ApiHandler):
             # Activate project if provided
             if project_name:
                 try:
-                    activate_project(context_id, project_name)
+                    projects.activate_project(context_id, project_name)
                 except Exception as e:
                     # Handle project or context errors more gracefully
                     error_msg = str(e)
@@ -129,17 +129,6 @@ class ApiMessage(ApiHandler):
                     return Response(
                         f'{{"error": "Failed to activate project \\"{project_name}\\""}}',
                         status=500,
-                        mimetype="application/json",
-                    )
-
-            # Activate project if provided
-            if project_name:
-                try:
-                    projects.activate_project(context_id, project_name)
-                except Exception as e:
-                    return Response(
-                        f'{{"error": "Failed to activate project: {str(e)}"}}',
-                        status=400,
                         mimetype="application/json",
                     )
 
