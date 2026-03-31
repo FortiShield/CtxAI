@@ -1,12 +1,12 @@
 <div align="center">
 
-# `Ctx AI`
+# `CtxAI`
 
 <p align="center">
     <a href="https://trendshift.io/repositories/11745" target="_blank"><img src="https://trendshift.io/api/badge/repositories/11745" alt="frdel%2Fctxai | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 </p>
 
-[![Ctx AI Website](https://img.shields.io/badge/Website-agent--zero.ai-0A192F?style=for-the-badge&logo=vercel&logoColor=white)](https://ctxai.ai) [![Thanks to Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-Thanks%20to%20Sponsors-FF69B4?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/ctxos) [![Follow on X](https://img.shields.io/badge/X-Follow-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/khulnasoft) [![Join our Discord](https://img.shields.io/badge/Discord-Join%20our%20server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B8KZKNsPpj) [![Subscribe on YouTube](https://img.shields.io/badge/YouTube-Subscribe-red?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@CtxAiFW) [![Connect on LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jan-tomasek/) [![Follow on Warpcast](https://img.shields.io/badge/Warpcast-Follow-5A32F3?style=for-the-badge)](https://warpcast.com/ctxai)
+[![CtxAI Website](https://img.shields.io/badge/Website-ctx.khulnasoft.com-0A192F?style=for-the-badge&logo=vercel&logoColor=white)](https://ctxai.ai) [![Thanks to Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-Thanks%20to%20Sponsors-FF69B4?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/ctxos) [![Follow on X](https://img.shields.io/badge/X-Follow-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/khulnasoft) [![Join our Discord](https://img.shields.io/badge/Discord-Join%20our%20server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B8KZKNsPpj) [![Subscribe on YouTube](https://img.shields.io/badge/YouTube-Subscribe-red?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@CtxAIFW) [![Connect on LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jan-tomasek/) [![Follow on Warpcast](https://img.shields.io/badge/Warpcast-Follow-5A32F3?style=for-the-badge)](https://warpcast.com/ctxai)
 
 
 ## Documentation:
@@ -26,7 +26,7 @@ Or see DeepWiki generated documentation:
 
 <div align="center">
 
-> ### 🚨 **CTXAI SKILLS** 🚨
+> ### 🚨 **CtxAI SKILLS** 🚨
 > **Skills System** - portable, structured agent capabilities using the open `SKILL.md` standard (compatible with Claude Code, Codex and more).
 > 
 > **Plus:** Git-based Projects with authentication for public/private repositories - clone codebases directly into isolated workspaces.
@@ -43,25 +43,43 @@ Or see DeepWiki generated documentation:
 
 
 
-- Ctx AI is not a predefined agentic framework. It is designed to be dynamic, organically growing, and learning as you use it.
-- Ctx AI is fully transparent, readable, comprehensible, customizable, and interactive.
-- Ctx AI uses the computer as a tool to accomplish its (your) tasks.
+- CtxAI is not a predefined agentic framework. It is designed to be dynamic, organically growing, and learning as you use it.
+- CtxAI is fully transparent, readable, comprehensible, customizable, and interactive.
+- CtxAI uses the computer as a tool to accomplish its (your) tasks.
 
 # ⚙️ Installation
 
-Click to open a video to learn how to install Ctx AI:
+Click to open a video to learn how to install CtxAI:
 
-[![Easy Installation guide](/docs/res/easy_ins_vid.png)](https://www.youtube.com/watch?v=w5v5Kjx51hs)
+[![Easy Installation guide](/docs/res/install_guide.png)](https://www.youtube.com/watch?v=2-qFNUvqrXA)
 
-A detailed setup guide for Windows, macOS, and Linux with a video can be found in the Ctx AI Documentation at [this page](./docs/setup/installation.md).
+A detailed setup guide for Windows, macOS, and Linux with a video can be found in the CtxAI Documentation at [this page](./docs/setup/installation.md).
 
 ### ⚡ Quick Start
 
 ```bash
 # Pull and run with Docker
-
 docker pull ctxos/ctxai
 docker run -p 50001:80 ctxos/ctxai
+
+# Visit http://localhost:50001 to start
+```
+
+### 🚀 Local Development with UV
+
+```bash
+# Install UV (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Clone and setup
+git clone https://github.com/FortiShield/CtxAI.git
+cd CtxAI
+
+# Install dependencies with UV
+uv sync
+
+# Start the WebUI
+uv run python run_ui.py
 
 # Visit http://localhost:50001 to start
 ```
@@ -71,27 +89,34 @@ docker run -p 50001:80 ctxos/ctxai
 
 1. **General-purpose Assistant**
 
-- Ctx AI is not pre-programmed for specific tasks (but can be). It is meant to be a general-purpose personal assistant. Give it a task, and it will gather information, execute commands and code, cooperate with other agent instances, and do its best to accomplish it.
+- CtxAI is not pre-programmed for specific tasks (but can be). It is meant to be a general-purpose personal assistant. Give it a task, and it will gather information, execute commands and code, cooperate with other agent instances, and do its best to accomplish it.
 - It has a persistent memory, allowing it to memorize previous solutions, code, facts, instructions, etc., to solve tasks faster and more reliably in the future.
 
-![CtxAI Working](/docs/res/ui_screen2.png)
+![Agent 0 Working](/docs/res/ui_screen2.png)
 
 2. **Computer as a Tool**
 
-- Ctx AI uses the operating system as a tool to accomplish its tasks. It has no single-purpose tools pre-programmed. Instead, it can write its own code and use the terminal to create and use its own tools as needed.
+- CtxAI uses the operating system as a tool to accomplish its tasks. It has no single-purpose tools pre-programmed. Instead, it can write its own code and use the terminal to create and use its own tools as needed.
 - The only default tools in its arsenal are online search, memory features, communication (with the user and other agents), and code/terminal execution. Everything else is created by the agent itself or can be extended by the user.
 - Tool usage functionality has been developed from scratch to be the most compatible and reliable, even with very small models.
-- **Default Tools:** Ctx AI includes tools like knowledge, code execution, and communication.
-- **Creating Custom Tools:** Extend Ctx AI's functionality by creating your own custom tools.
+- **Default Tools:** CtxAI includes tools like knowledge, code execution, and communication.
+- **Creating Custom Tools:** Extend CtxAI's functionality by creating your own custom tools.
 - **Skills (SKILL.md Standard):** Skills are contextual expertise loaded dynamically when relevant. They use the open SKILL.md standard (developed by Anthropic), making them compatible with Claude Code, Cursor, Goose, OpenAI Codex CLI, and GitHub Copilot.
 
 3. **Multi-agent Cooperation**
 
 - Every agent has a superior agent giving it tasks and instructions. Every agent then reports back to its superior.
-- In the case of the first agent in the chain (CtxAI), the superior is the human user; the agent sees no difference.
+- In the case of the first agent in the chain (Agent 0), the superior is the human user; the agent sees no difference.
 - Every agent can create its subordinate agent to help break down and solve subtasks. This helps all agents keep their context clean and focused.
 
 ![Multi-agent](docs/res/usage/multi-agent.png)
+
+### Browser Agent
+
+- Browser automation is provided by the built-in `_browser_agent` plugin.
+- It uses the effective Main Model resolved by `_model_config`; there is no separate browser model slot.
+- Browser vision follows the Main Model's vision setting.
+- Playwright Chromium: **Docker** images ship the headless shell preinstalled. **Local development** installs it on first Browser Agent use via `ensure_playwright_binary()` in `plugins/_browser_agent/helpers/playwright.py` (into `tmp/playwright`); you can pre-install manually (see [Development Setup](docs/setup/dev-setup.md)) to skip the wait.
 
 4. **Completely Customizable and Extensible**
 
@@ -99,8 +124,8 @@ docker run -p 50001:80 ctxos/ctxai
 - The whole behavior is defined by a system prompt in the **prompts/default/agent.system.md** file. Change this prompt and change the framework dramatically.
 - The framework does not guide or limit the agent in any way. There are no hard-coded rails that agents have to follow.
 - Every prompt, every small message template sent to the agent in its communication loop can be found in the **prompts/** folder and changed.
-- Every default tool can be found in the **python/tools/** folder and changed or copied to create new predefined tools.
-- **Automated configuration** via `CTX_SET_` environment variables for deployment automation and easy setup.
+- Built-in tools live in the core **tools/** folder or in built-in plugins under **plugins/** and can be adapted or extended.
+- **Automated configuration** via `CTX0_SET_` environment variables for deployment automation and easy setup.
 
 ![Prompts](/docs/res/profiles.png)
 
@@ -140,11 +165,11 @@ docker run -p 50001:80 ctxos/ctxai
 
 ## 👀 Keep in Mind
 
-1. **Ctx AI Can Be Dangerous!**
+1. **CtxAI Can Be Dangerous!**
 
-- With proper instruction, Ctx AI is capable of many things, even potentially dangerous actions concerning your computer, data, or accounts. Always run Ctx AI in an isolated environment (like Docker) and be careful what you wish for.
+- With proper instruction, CtxAI is capable of many things, even potentially dangerous actions concerning your computer, data, or accounts. Always run CtxAI in an isolated environment (like Docker) and be careful what you wish for.
 
-2. **Ctx AI Is Prompt-based.**
+2. **CtxAI Is Prompt-based.**
 
 - The whole framework is guided by the **prompts/** folder. Agent guidelines, tool instructions, messages, utility AI functions, it's all there.
 
@@ -158,14 +183,17 @@ docker run -p 50001:80 ctxos/ctxai
 | [Guides](./docs/guides/) | Step-by-step guides: Usage, Projects, API Integration, MCP Setup, A2A Setup |
 | [Development Setup](./docs/setup/dev-setup.md) | Development and customization |
 | [WebSocket Infrastructure](./docs/developer/websockets.md) | Real-time WebSocket handlers, client APIs, filtering semantics, envelopes |
-| [Extensions](./docs/developer/extensions.md) | Extending Ctx AI |
+| [Extensions](./docs/developer/extensions.md) | Extending CtxAI |
 | [Connectivity](./docs/developer/connectivity.md) | External API endpoints, MCP server connections, A2A protocol |
 | [Architecture](./docs/developer/architecture.md) | System design and components |
 | [Contributing](./docs/guides/contribution.md) | How to contribute |
 | [Troubleshooting](./docs/guides/troubleshooting.md) | Common issues and their solutions |
+| [Release Notes](./docs/release_notes/README.md) | Release note format used by the automated Docker and GitHub release workflow |
 
 
 ## 🎯 Changelog
+
+New release-note files for current releases live in [docs/release_notes](./docs/release_notes/README.md). The latest eligible `main` tag uses `docs/release_notes/vX.Y.md` for the GitHub release body.
 
 ### v0.9.8 - Skills, UI Redesign & Git projects
 [Release video](https://youtu.be/NV7s78yn6DY)
@@ -197,7 +225,7 @@ docker run -p 50001:80 ctxos/ctxai
 - User data migration to `/usr` directory for cleaner separation of user and system files
 - Subagents system with configurable agent profiles for different roles
 - Memory operations offloaded to deferred tasks for better performance
-- Environment variables can now configure settings via `CTX_SET_*` prefix in `.env`
+- Environment variables can now configure settings via `CTX0_SET_*` prefix in `.env`
 - Automatic migration with overwrite support for `.env`, scheduler, knowledge, and legacy directories
 - Projects support extended to MCP, A2A, and external API
 - Workdir outside project support for more flexible file organization
@@ -238,7 +266,7 @@ docker run -p 50001:80 ctxos/ctxai
 - Secrets management - agent can use credentials without seeing them
 - Agent can copy paste messages and files without rewriting them
 - LiteLLM global configuration field
-- Custom HTTP headers field for browser agent
+- Browser agent configuration improvements
 - Progressive web app support
 - Extra model params support for JSON
 - Short IDs for files and memories to prevent LLM errors
@@ -249,7 +277,7 @@ docker run -p 50001:80 ctxos/ctxai
 ### v0.9.4 - Connectivity, UI
 [Release video](https://www.youtube.com/watch?v=C2BAdDOduIc)
 - External API endpoints
-- Streamable HTTP MCP CTX server
+- Streamable HTTP MCP CTX0 server
 - A2A (Agent to Agent) protocol - server+client
 - New notifications system
 - New local terminal interface for stability
@@ -320,8 +348,8 @@ docker run -p 50001:80 ctxos/ctxai
 ### v0.8.5 - **MCP Server + Client**
 [Release video](https://youtu.be/pM5f4Vz3_IQ)
 
-- Ctx AI can now act as MCP Server
-- Ctx AI can use external MCP servers as tools
+- CtxAI can now act as MCP Server
+- CtxAI can use external MCP servers as tools
 
 ### v0.8.4.1 - 2
 Default models set to gpt-4.1
@@ -388,5 +416,5 @@ Default models set to gpt-4.1
 ## 🤝 Community and Support
 
 - [Join our Discord](https://discord.gg/B8KZKNsPpj) for live discussions or [visit our Skool Community](https://www.skool.com/ctxai).
-- [Follow our YouTube channel](https://www.youtube.com/@CtxAiFW) for hands-on explanations and tutorials
+- [Follow our YouTube channel](https://www.youtube.com/@CtxAIFW) for hands-on explanations and tutorials
 - [Report Issues](https://github.com/ctxos/ctxai/issues) for bug fixes and features
