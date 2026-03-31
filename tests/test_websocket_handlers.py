@@ -8,10 +8,10 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from ctxai.utils.websocket import (
-    SingletonInstantiationError,
+from helpers.websocket import (
     WebSocketHandler,
     WebSocketResult,
+    SingletonInstantiationError,
 )
 
 
@@ -41,13 +41,10 @@ def test_websocket_result_ok_clones_payload():
     payload = {"value": 1}
     result = WebSocketResult.ok(payload)
 
-    assert (
-        result.as_result(
-            handler_id="handler",
-            fallback_correlation_id="corr",
-        )["data"]
-        == payload
-    )
+    assert result.as_result(
+        handler_id="handler",
+        fallback_correlation_id="corr",
+    )["data"] == payload
 
     payload["value"] = 2
     assert result.as_result(
@@ -143,18 +140,18 @@ def test_get_instance_returns_singleton():
 
 @pytest.mark.asyncio
 async def test_state_sync_handler_registers_and_routes_state_request():
-    from ctxai.utils.state_monitor import _reset_state_monitor_for_testing
-    from ctxai.utils.websocket_manager import WebSocketManager
-    from python.websocket_handlers.state_sync_handler import StateSyncHandler
+    from helpers.websocket_manager import WebSocketManager
+    from python.websocket_handlers.webui_handler import WebuiHandler
+    from helpers.state_monitor import _reset_state_monitor_for_testing
 
     _reset_state_monitor_for_testing()
-    StateSyncHandler._reset_instance_for_testing()
+    WebuiHandler._reset_instance_for_testing()
 
     socketio = _FakeSocketIO()
     lock = threading.RLock()
     manager = WebSocketManager(socketio, lock)
-    handler = StateSyncHandler.get_instance(socketio, lock)
-    namespace = "/state_sync"
+    handler = WebuiHandler.get_instance(socketio, lock)
+    namespace = "/webui"
     manager.register_handlers({namespace: [handler]})
     await manager.handle_connect(namespace, "sid-1")
 
