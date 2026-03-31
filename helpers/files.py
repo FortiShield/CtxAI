@@ -6,7 +6,7 @@ import re
 import base64
 import shutil
 import tempfile
-from typing import Any, Union, Literal
+from typing import Any, Union, Literal, Optional
 import zipfile
 import glob
 import mimetypes
@@ -635,7 +635,7 @@ def get_base_dir():
     return _base_dir
 
 
-def basename(path: str, suffix: str | None = None):
+def basename(path: str, suffix: Optional[str] = None):
     if suffix:
         return os.path.basename(path).removesuffix(suffix)
     return os.path.basename(path)
@@ -658,8 +658,8 @@ def is_in_dir(path: str, dir: str):
 
 def get_subdirectories(
     relative_path: str,
-    include: str | list[str] = "*",
-    exclude: str | list[str] | None = None,
+    include: Union[str, list[str]] = "*",
+    exclude: Union[str, list[str], None] = None,
 ):
     abs_path = get_abs_path(relative_path)
     if not os.path.exists(abs_path):

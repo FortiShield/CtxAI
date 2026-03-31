@@ -22,12 +22,27 @@ class FileBrowser:
     MAX_TEXT_FILE_SIZE = 1 * 1024 * 1024  # 1MB
 
     def __init__(self):
-        # if runtime.is_development():
-        #     base_dir = files.get_base_dir()
-        # else:
-        #     base_dir = "/"
-        base_dir = "/"
-        self.base_dir = Path(base_dir)
+        from helpers import runtime, files
+        if runtime.is_dockerized():
+            base_dir = "/ctx0"
+        else:
+            base_dir = files.get_base_dir()
+        self.base_dir = Path(base_dir).resolve()
+
+    def _validate_path(self, path: Union[str, Path]) -> Path:
+        """Resolve path and ensure it's within base_dir"""
+        if isinstance(path, str):
+            # If absolute path provided, it must still be within base_dir
+            if os.path.isabs(path):
+                full_path = Path(path).resolve()
+            else:
+                full_path = (self.base_dir / path).resolve()
+        else:
+            full_path = path.resolve()
+
+        if not str(full_path).startswith(str(self.base_dir)):
+             raise ValueError(f"Access denied: path {full_path} is outside base directory {self.base_dir}")
+        return full_path
 
     def _check_file_size(self, file) -> bool:
         try:
@@ -41,9 +56,7 @@ class FileBrowser:
     def save_file_b64(self, current_path: str, filename: str, base64_content: str):
         try:
             # Resolve the target directory path
-            target_file = (self.base_dir / current_path / filename).resolve()
-            if not str(target_file).startswith(str(self.base_dir)):
-                raise ValueError("Invalid target directory")
+            target_file = self._validate_path(Path(current_path) / filename)
 
             os.makedirs(target_file.parent, exist_ok=True)
             # Save file
@@ -61,9 +74,7 @@ class FileBrowser:
 
         try:
             # Resolve the target directory path
-            target_dir = (self.base_dir / current_path).resolve()
-            if not str(target_dir).startswith(str(self.base_dir)):
-                raise ValueError("Invalid target directory")
+            target_dir = self._validate_path(current_path)
 
             os.makedirs(target_dir, exist_ok=True)
 
@@ -93,9 +104,7 @@ class FileBrowser:
         """Delete a file or empty directory"""
         try:
             # Resolve the full path while preventing directory traversal
-            full_path = (self.base_dir / file_path).resolve()
-            if not str(full_path).startswith(str(self.base_dir)):
-                raise ValueError("Invalid path")
+            full_path = self._validate_path(file_path)
 
             if os.path.exists(full_path):
                 if os.path.isfile(full_path):
@@ -117,15 +126,11 @@ class FileBrowser:
             if "/" in new_name or "\\" in new_name:
                 raise ValueError("New name cannot include path separators")
 
-            full_path = (self.base_dir / file_path).resolve()
-            if not str(full_path).startswith(str(self.base_dir)):
-                raise ValueError("Invalid path")
+            full_path = self._validate_path(file_path)
             if not full_path.exists():
                 raise FileNotFoundError("File or folder not found")
 
-            new_path = full_path.with_name(new_name)
-            if not str(new_path).startswith(str(self.base_dir)):
-                raise ValueError("Invalid target path")
+            new_path = self._validate_path(full_path.with_name(new_name))
             if full_path == new_path:
                 return True
             if new_path.exists():
@@ -144,13 +149,9 @@ class FileBrowser:
             if "/" in folder_name or "\\" in folder_name:
                 raise ValueError("Folder name cannot include path separators")
 
-            parent_full = (self.base_dir / parent_path).resolve()
-            if not str(parent_full).startswith(str(self.base_dir)):
-                raise ValueError("Invalid parent path")
+            parent_full = self._validate_path(parent_path)
 
-            target_dir = (parent_full / folder_name).resolve()
-            if not str(target_dir).startswith(str(self.base_dir)):
-                raise ValueError("Invalid target path")
+            target_dir = self._validate_path(parent_full / folder_name)
             if target_dir.exists():
                 raise FileExistsError("Folder already exists")
 
@@ -168,9 +169,7 @@ class FileBrowser:
             if content_size > self.MAX_TEXT_FILE_SIZE:
                 raise ValueError("File exceeds 1 MB and cannot be edited")
 
-            full_path = (self.base_dir / file_path).resolve()
-            if not str(full_path).startswith(str(self.base_dir)):
-                raise ValueError("Invalid path")
+            full_path = self._validate_path(file_path)
             if full_path.exists() and full_path.is_dir():
                 raise ValueError("Target is a directory")
 
@@ -199,7 +198,7 @@ class FileBrowser:
 
     def _get_files_via_ls(self, full_path: Path) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """Get files and folders using ls command for better error handling"""
-        files: List[Dict[str, Any]] = []
+        files_list: List[Dict[str, Any]] = []
         folders: List[Dict[str, Any]] = []
 
         try:
@@ -213,12 +212,12 @@ class FileBrowser:
 
             if result.returncode != 0:
                 PrintStyle.error(f"ls command failed: {result.stderr}")
-                return files, folders
+                return files_list, folders
 
             # Parse ls output (skip first line which is "total X")
             lines = result.stdout.strip().split('\n')
             if len(lines) <= 1:
-                return files, folders
+                return files_list, folders
 
             for line in lines[1:]:  # Skip the "total" line
                 try:
@@ -274,7 +273,7 @@ class FileBrowser:
                                 "size": stat_info.st_size,
                                 "is_dir": False
                             })
-                            files.append(entry_data)
+                            files_list.append(entry_data)
                         elif entry_path.is_dir():
                             entry_data.update({
                                 "type": "folder",
@@ -288,7 +287,7 @@ class FileBrowser:
                         PrintStyle.warning(f"No access to {filename}: {e}")
                         continue
 
-                    if len(files) + len(folders) > 10000:
+                    if len(files_list) + len(folders) > 10000:
                         break
 
                 except Exception as e:
@@ -301,27 +300,25 @@ class FileBrowser:
         except Exception as e:
             PrintStyle.error(f"Error running ls command: {e}")
 
-        return files, folders
+        return files_list, folders
 
     def get_files(self, current_path: str = "") -> Dict:
         try:
             # Resolve the full path while preventing directory traversal
-            full_path = (self.base_dir / current_path).resolve()
-            if not str(full_path).startswith(str(self.base_dir)):
-                raise ValueError("Invalid path")
+            full_path = self._validate_path(current_path)
 
             # Use ls command instead of os.scandir for better error handling
-            files, folders = self._get_files_via_ls(full_path)
+            files_list, folders = self._get_files_via_ls(full_path)
 
             # Combine folders and files, folders first
-            all_entries = folders + files
+            all_entries = folders + files_list
 
             # Get parent directory path if not at root
             parent_path = ""
             if current_path:
                 try:
                     # Get the absolute path of current directory
-                    current_abs = (self.base_dir / current_path).resolve()
+                    current_abs = self._validate_path(current_path)
 
                     # parent_path is empty only if we're already at root
                     if str(current_abs) != str(self.base_dir):
@@ -342,10 +339,10 @@ class FileBrowser:
 
     def get_full_path(self, file_path: str, allow_dir: bool = False) -> str:
         """Get full file path if it exists and is within base_dir"""
-        full_path = files.get_abs_path(self.base_dir, file_path)
-        if not files.exists(full_path):
+        full_path = self._validate_path(file_path)
+        if not full_path.exists():
             raise ValueError(f"File {file_path} not found")
-        return full_path
+        return str(full_path)
 
     def _get_file_type(self, filename: str) -> str:
         ext = self._get_file_extension(filename)
