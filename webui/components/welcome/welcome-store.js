@@ -221,7 +221,7 @@ const model = {
         chatInputStore.browseFiles();
         break;
       case "website":
-        window.open("https://ctxai.ai", "_blank");
+        window.open("https://ctx.khulnasoft.com", "_blank");
         break;
     }
   },
