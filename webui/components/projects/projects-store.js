@@ -69,7 +69,7 @@ const model = {
   getSelectedProjectSkillsPath() {
     const projectName = this.selectedProject?.name;
     if (!projectName) return "";
-    return `usr/projects/${projectName}/.ctxproj/skills/`;
+    return `usr/projects/${projectName}/.ctx0proj/skills/`;
   },
 
   async openSelectedProjectSkillsImport() {
@@ -432,7 +432,7 @@ const model = {
   },
 
   async browseInstructionFiles() {
-    await this.browseSelected(".ctxproj", "instructions");
+    await this.browseSelected(".ctx0proj", "instructions");
     try {
       const newData = await this._createEditProjectData(
         this.selectedProject.name
@@ -445,7 +445,7 @@ const model = {
   },
 
   async browseKnowledgeFiles() {
-    await this.browseSelected(".ctxproj", "knowledge");
+    await this.browseSelected(".ctx0proj", "knowledge");
     // refresh and reindex project
     try {
       // progress notification
@@ -459,7 +459,7 @@ const model = {
       });
 
       // call reindex knowledge
-      const reindexCall = api.callJsonApi("/knowledge_reindex", {
+      const reindexCall = api.callJsonApi("/plugins/_memory/knowledge_reindex", {
         ctxid: shortcuts.getCurrentContextId(),
       });
 
@@ -495,7 +495,7 @@ const model = {
   },
 
   getSelectedAbsPath(...relPath) {
-    return ["/ctx/usr/projects", this.selectedProject.name, ...relPath]
+    return ["/ctx0/usr/projects", this.selectedProject.name, ...relPath]
       .join("/")
       .replace(/\/+/g, "/");
   },
