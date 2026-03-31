@@ -439,7 +439,7 @@ def test_self_update_modal_uses_standard_select_and_manual_backup():
     assert "getLastStatusLabel($store.selfUpdateStore.info?.last_status?.status)" in content
     assert "Latest version" in content
     assert "Docker update guide" in content
-    assert "https://www.ctxai.ai/p/docs/get-started/" in content
+    assert "https://www.ctx.khulnasoft.com/p/docs/get-started/" in content
     assert "Manual backup" in content
     assert 'type="button"' in content
     assert "@blur" not in content
