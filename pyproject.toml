@@ -133,6 +133,8 @@ dependencies = [
   # --- Platform-specific ---
   "pywinpty>=3.0; sys_platform == 'win32'",
   "watchdog>=6.0.0",
+  "scipy>=1.17.1",
+  "scikit-learn>=1.8.0",
 ]
 
 # =========================
