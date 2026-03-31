@@ -370,6 +370,7 @@ class Agent:
         self.last_user_message: history.Message | None = None
         self.intervention: UserMessage | None = None
         self.data: dict[str, Any] = {}  # free data object all the tools can use
+        self.repeat_count = 0
 
         extension.call_extensions_sync("agent_init", self)
 
@@ -468,6 +469,10 @@ class Agent:
                         if (
                             self.loop_data.last_response == agent_response
                         ):  # if assistant_response is the same as last message in history, let him know
+                            self.repeat_count += 1
+                            if self.repeat_count > 3:
+                                raise HandledException(f"Agent {self.agent_name} is stuck in a repetition loop and has been stopped.")
+
                             # Append the assistant's response to the history
                             log_item = self.loop_data.params_temporary.get(
                                 "log_item_generating"
@@ -486,6 +491,7 @@ class Agent:
                             )
 
                         else:  # otherwise proceed with tool
+                            self.repeat_count = 0
                             # Append the assistant's response to the history
                             log_item = self.loop_data.params_temporary.get(
                                 "log_item_generating"
@@ -974,16 +980,16 @@ class Agent:
     async def validate_tool_request(self, tool_request: Any):
         if not isinstance(tool_request, dict):
             raise ValueError("Tool request must be a dictionary")
-        if not tool_request.get("tool_name") or not isinstance(
-            tool_request.get("tool_name"), str
-        ):
-            raise ValueError("Tool request must have a tool_name (type string) field")
-        if not tool_request.get("tool_args") or not isinstance(
-            tool_request.get("tool_args"), dict
-        ):
-            raise ValueError(
-                "Tool request must have a tool_args (type dictionary) field"
-            )
+
+        # Allow 'tool_name' OR 'tool'
+        tool_name = tool_request.get("tool_name") or tool_request.get("tool")
+        if not tool_name or not isinstance(tool_name, str):
+            raise ValueError("Tool request must have a tool_name (or 'tool') field of type string")
+
+        # Allow 'tool_args' OR 'args'
+        tool_args = tool_request.get("tool_args") or tool_request.get("args")
+        if tool_args is not None and not isinstance(tool_args, dict):
+            raise ValueError("Tool request 'tool_args' (or 'args') must be a dictionary")
 
     async def handle_reasoning_stream(self, stream: str):
         await self.handle_intervention()
