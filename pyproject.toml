@@ -86,7 +86,7 @@ dependencies = [
   "faiss-cpu>=1.9.0; sys_platform != 'darwin'",
   # --- Agent Protocols ---
   "mcp>=1.22,<2.0",
-  "fastmcp>=2.13,<3.0",
+  "fastmcp>=2.13,<4.0",
   "fasta2a>=0.5,<1.0",
   # --- Browser Automation ---
   "playwright>=1.52,<2.0",
