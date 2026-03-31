@@ -94,10 +94,6 @@ export async function getMessageHandler(type) {
       return drawMessageResponse;
     case "tool":
       return drawMessageTool;
-    case "code_exe":
-      return drawMessageCodeExe;
-    case "browser":
-      return drawMessageBrowser;
     case "progress":
       return drawMessageProgress;
     case "mcp":
@@ -319,7 +315,7 @@ function getOrCreateProcessGroup(id, allowCompleted = true) {
   return group;
 }
 
-function buildDetailPayload(stepData, extras = {}) {
+export function buildDetailPayload(stepData, extras = {}) {
   if (!stepData) return null;
   return {
     ...stepData,
@@ -331,7 +327,7 @@ function buildDetailPayload(stepData, extras = {}) {
  * @param {ProcessStepArgs & Record<string, any>} param0
  * @returns {MessageHandlerResult}
  */
-function drawProcessStep({
+export function drawProcessStep({
   id,
   title,
   code,
@@ -1126,9 +1122,9 @@ export function drawMessageUser({
 
 /**
  * @param {MessageHandlerArgs & Record<string, any>} param0
- * @returns {MessageHandlerResult}
+ * @returns {Promise<MessageHandlerResult>}
  */
-export function drawMessageTool({
+export async function drawMessageTool({
   id,
   type,
   heading,
@@ -1143,18 +1139,28 @@ export function drawMessageTool({
   if (!tool_name) {
     return drawMessageToolSimple({ ...arguments[0] });
   } else if (kvps._tool_name === "skills_tool") {
-    return drawMessageToolSimple({ ...arguments[0], code: "SKL" });
+    const displayKvps = { ...(kvps || {}) };
+    delete displayKvps._tool_name;
+    return drawMessageToolSimple({ ...arguments[0], code: "SKL", displayKvps });
   } else if (kvps._tool_name === "vision_load") {
     return drawMessageToolSimple({ ...arguments[0], code: "EYE" });
   } else if (kvps._tool_name === "search_engine") {
     return drawMessageToolSimple({ ...arguments[0], code: "WEB" });
-  } else if (kvps._tool_name === "browser_agent") {
-    return drawMessageToolSimple({ ...arguments[0], code: "WWW" });
   } else if (kvps._tool_name.startsWith("memory_")) {
     return drawMessageToolSimple({ ...arguments[0], code: "MEM" });
-  } else {
-    return drawMessageToolSimple({ ...arguments[0] });
   }
+
+  /** @type {{ tool_name: string, kvps: any, handler: Function | undefined }} */
+  const extData = {
+    tool_name,
+    kvps,
+    handler: undefined,
+  };
+  await callJsExtensions("get_tool_message_handler", extData);
+  if (typeof extData.handler === "function") {
+    return extData.handler(arguments[0]);
+  }
+  return drawMessageToolSimple({ ...arguments[0] });
 }
 
 /**
@@ -1195,123 +1201,6 @@ export function drawMessageToolSimple({
     id,
     title,
     code: code || "USE",
-    classes: undefined,
-    kvps: displayKvps,
-    content,
-    // contentClasses: [],
-    actionButtons,
-    log: arguments[0],
-  });
-}
-
-/**
- * @param {MessageHandlerArgs & Record<string, any>} param0
- * @returns {MessageHandlerResult}
- */
-export function drawMessageCodeExe({
-  id,
-  type,
-  heading,
-  test,
-  content,
-  kvps,
-  timestamp,
-  agentno = 0,
-  ...additional
-}) {
-  let title = "Code Execution";
-  // show command at the start and end
-  if (kvps?.code && /done_all|code_execution_tool/.test(heading || "")) {
-    const s = kvps.session;
-    title = `${s != null ? `[${s}] ` : ""}${kvps.runtime || "bash"}> ${kvps.code.trim()}`;
-  } else {
-    // during execution show the original heading (current step)
-    title = cleanStepTitle(heading);
-  }
-
-  // KVPS to show
-  const displayKvps = {};
-  // if (kvps?.runtime) displayKvps.runtime = kvps.runtime;
-  // if (kvps?.session>=0) displayKvps.session = kvps.session;
-
-  const headerLabels = [
-    kvps?.runtime && { label: kvps.runtime, class: "tool-name-badge" },
-    kvps?.session != null && {
-      label: `Session ${kvps.session}`,
-      class: "header-label",
-    },
-  ].filter(Boolean);
-
-  // render the standard step
-  const commandText = String(kvps?.code ?? "");
-  const outputText = String(content ?? "");
-
-  const actionButtons = [];
-  actionButtons.push(
-    createActionButton("detail", "", () =>
-      stepDetailStore.showStepDetail(
-        buildDetailPayload(arguments[0], { headerLabels }),
-      ),
-    ),
-  );
-  if (commandText.trim()) {
-    actionButtons.push(
-      createActionButton("copy", "Command", () => copyToClipboard(commandText)),
-    );
-  }
-  if (outputText.trim()) {
-    actionButtons.push(
-      createActionButton("copy", "Output", () => copyToClipboard(outputText)),
-    );
-  }
-  const stepData = drawProcessStep({
-    id,
-    title,
-    code: "EXE",
-    classes: undefined,
-    kvps: displayKvps,
-    content,
-    contentClasses: ["terminal-output"],
-    actionButtons,
-    log: arguments[0],
-  });
-
-  return stepData;
-}
-
-/**
- * @param {MessageHandlerArgs & Record<string, any>} param0
- * @returns {MessageHandlerResult}
- */
-export function drawMessageBrowser({
-  id,
-  type,
-  heading,
-  content,
-  kvps,
-  timestamp,
-  agentno = 0,
-  ...additional
-}) {
-  const title = cleanStepTitle(heading);
-  let displayKvps = { ...kvps };
-  const answerText = String(kvps?.answer ?? "");
-  const actionButtons = answerText.trim()
-    ? [
-        createActionButton("detail", "", () =>
-          stepDetailStore.showStepDetail(
-            buildDetailPayload(arguments[0], { headerLabels: [] }),
-          ),
-        ),
-        createActionButton("speak", "", () => speechStore.speak(answerText)),
-        createActionButton("copy", "", () => copyToClipboard(answerText)),
-      ].filter(Boolean)
-    : [];
-
-  return drawProcessStep({
-    id,
-    title,
-    code: "WWW",
     classes: undefined,
     kvps: displayKvps,
     content,
@@ -2143,7 +2032,7 @@ export function convertIcons(html, classes = "") {
  * Clean step title by removing icon:// prefixes and status phrases
  * Preserves agent markers (A1:, A2:, etc.) so users can see which subordinate agent is executing
  */
-function cleanStepTitle(text, maxLength = 100) {
+export function cleanStepTitle(text, maxLength = 100) {
   if (!text) return "";
   let cleaned = String(text)
     .replace(/icon:\/\/[a-zA-Z0-9_]+(\[(?:\\.|[^\]])*\])?\s*/g, "")

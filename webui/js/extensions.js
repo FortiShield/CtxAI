@@ -25,7 +25,7 @@ export const API_EXTENSION_EXCLUDED_ENDPOINTS = new Set([
   "/api/load_webui_extensions",
 ]);
 
-export function invalidateCache() {
+export function clearCache() {
   cache.clear(JS_CACHE_AREA);
   cache.clear(HTML_CACHE_AREA);
 }
@@ -115,6 +115,41 @@ export async function loadHtmlExtensions(roots = [document.documentElement]) {
   }
 }
 
+/**
+ * Reload and re-render all HTML extensions in the given DOM roots.
+ *
+ * @param {Element | Document | Array<Element | Document>} [roots]
+ * @returns {Promise<void>}
+ */
+export async function reloadHtmlExtensions(roots = [document.documentElement]) {
+  try {
+    /** @type {Array<Element | Document>} */
+    const rootElements = Array.isArray(roots) ? roots : [roots];
+
+    /** @type {Element[]} */
+    const extensions = rootElements.flatMap((root) =>
+      Array.from(root.querySelectorAll("x-extension")),
+    );
+
+    if (extensions.length === 0) return;
+
+    await Promise.all(
+      extensions.map(async (extension) => {
+        const path = extension.getAttribute("id");
+        if (!path) {
+          console.error("x-extension missing id attribute:", extension);
+          return;
+        }
+
+        extension.innerHTML = "";
+        await importHtmlExtensions(path, /** @type {HTMLElement} */ (extension));
+      }),
+    );
+  } catch (error) {
+    console.error("Error reloading HTML extensions:", error);
+  }
+}
+
 // import all extensions for extension point via backend api
 /**
  * Import all HTML extensions for an extension point and inject them as `<x-component>` tags.
@@ -180,3 +215,12 @@ const extensionObserverCallback = (mutations) => {
 /** @type {MutationObserver} */
 const extensionObserver = new MutationObserver(extensionObserverCallback);
 extensionObserver.observe(document.body, { childList: true, subtree: true });
+
+// Do an initial scan for static x-extension tags
+// that already exist in the DOM (index.html), then rely on
+// the observer for dynamically inserted nodes coming from components.
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => loadHtmlExtensions());
+} else {
+  loadHtmlExtensions();
+}
