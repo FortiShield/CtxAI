@@ -160,9 +160,21 @@ update-deps: ## Update dependencies
 	fi
 
 # Docker
+DOCKER_BASE_IMAGE := ctxos/ctxai-base
+DOCKER_BASE_TAG := latest
+DOCKER_PLATFORMS := linux/amd64,linux/arm64
+
+docker-base: ## Build base Docker image for current platform
+	@echo "$(BLUE)Building base Docker image $(DOCKER_BASE_IMAGE):$(DOCKER_BASE_TAG)...$(NC)"
+	docker buildx build --builder mybuilder -f docker/base/Dockerfile -t $(DOCKER_BASE_IMAGE):$(DOCKER_BASE_TAG) --load .
+
+docker-base-push: ## Build and push multi-arch base Docker image
+	@echo "$(BLUE)Building and pushing multi-arch base Docker image $(DOCKER_BASE_IMAGE):$(DOCKER_BASE_TAG)...$(NC)"
+	docker buildx build --builder mybuilder -f docker/base/Dockerfile -t $(DOCKER_BASE_IMAGE):$(DOCKER_BASE_TAG) --platform $(DOCKER_PLATFORMS) --push .
+
 docker-build: ## Build Docker image
 	@echo "$(BLUE)Building Docker image $(DOCKER_IMAGE):$(DOCKER_TAG)...$(NC)"
-	docker build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
+	docker build -f DockerfileLocal -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
 
 docker-run: ## Run CtxAI with Docker
 	@echo "$(BLUE)Running CtxAI with Docker...$(NC)"
@@ -176,6 +188,10 @@ docker-dev: ## Run development environment with Docker Compose
 docker-stop: ## Stop Docker Compose services
 	@echo "$(BLUE)Stopping Docker Compose services...$(NC)"
 	cd docker/run && docker-compose down
+
+docker-test: ## Run tests inside Docker container
+	@echo "$(BLUE)Running tests in Docker container...$(NC)"
+	docker run --rm --entrypoint python $(DOCKER_IMAGE):$(DOCKER_TAG) -m pytest -v
 
 # Documentation
 docs: ## Generate documentation
