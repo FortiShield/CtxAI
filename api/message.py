@@ -28,10 +28,8 @@ class Message(ApiHandler):
             attachments = request.files.getlist("attachments")
             attachment_paths = []
 
-             upload_folder_int = "/ctx0/usr/uploads"
-            upload_folder_ext = files.get_abs_path(
-                "usr/uploads"
-            )  # for development environment
+            upload_folder_int = "/ctx0/usr/uploads"
+            upload_folder_ext = files.get_abs_path("usr/uploads")  # for development environment
 
             if attachments:
                 os.makedirs(upload_folder_ext, exist_ok=True)
@@ -60,9 +58,7 @@ class Message(ApiHandler):
 
         # call extension point, alow it to modify data
         data = {"message": message, "attachment_paths": attachment_paths}
-        await extension.call_extensions_async(
-            "user_message_ui", agent=context.get_agent(), data=data
-        )
+        await extension.call_extensions_async("user_message_ui", agent=context.get_agent(), data=data)
         message = data.get("message", "")
         attachment_paths = data.get("attachment_paths", [])
 
@@ -73,7 +69,5 @@ class Message(ApiHandler):
         mq.log_user_message(context, message, attachment_paths, message_id)
 
         return context.communicate(
-            UserMessage(
-                message=message, attachments=attachment_paths, id=message_id or ""
-            )
+            UserMessage(message=message, attachments=attachment_paths, id=message_id or "")
         ), context
