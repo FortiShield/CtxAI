@@ -130,7 +130,7 @@ def register_watchdogs():
             if plugin_name and plugin_name not in plugin_names:
                 plugin_names.append(plugin_name)
         print_style.PrintStyle.debug("Plugins watchdog triggered", plugin_names)
-        python_change = any(path.endswith('.py') for path, _event in events)
+        python_change = any(path.endswith(".py") for path, _event in events)
         after_plugin_change(plugin_names or None, python_change=python_change)
 
     relevant_patterns = ["**/extensions/**/*", TOGGLE_FILE_PATTERN, HOOKS_SCRIPT]
@@ -177,7 +177,7 @@ def register_watchdogs():
 
 
 @extension.extensible
-def after_plugin_change(plugin_names: list[str] | None = None, python_change:bool=False):
+def after_plugin_change(plugin_names: list[str] | None = None, python_change: bool = False):
     clear_plugin_cache(plugin_names)
     if python_change:
         refresh_plugin_modules(plugin_names)
@@ -227,6 +227,8 @@ def get_plugins_list():
     result: list[str] = []
     seen_names: set[str] = set()
     for root in get_plugin_roots():
+        if not Path(root).exists():
+            continue
         for dir in Path(root).iterdir():
             if not dir.is_dir() or dir.name.startswith("."):
                 continue
@@ -249,6 +251,8 @@ def get_enhanced_plugins_list(
     allowed_names = set(plugin_names) if plugin_names else None
 
     def load_plugins(root_path: str, is_custom: bool):
+        if not Path(root_path).exists():
+            return
         for d in sorted(Path(root_path).iterdir(), key=lambda p: p.name):
             try:
                 if not d.is_dir() or d.name.startswith("."):
@@ -323,9 +327,7 @@ def get_enhanced_plugins_list(
 def get_custom_plugins_updates(
     plugin_names: list[str] | None = None,
 ) -> List[PluginUpdateInfo]:
-    plugins = get_enhanced_plugins_list(
-        custom=True, builtin=False, plugin_names=plugin_names
-    )
+    plugins = get_enhanced_plugins_list(custom=True, builtin=False, plugin_names=plugin_names)
     results: list[PluginUpdateInfo] = []
 
     for plugin in plugins:
@@ -352,9 +354,7 @@ def get_plugin_meta(plugin_name: str):
     plugin_dir = find_plugin_dir(plugin_name)
     if not plugin_dir:
         return None
-    return PluginMetadata.model_validate(
-        files.read_file_yaml(files.get_abs_path(plugin_dir, META_FILE_NAME))
-    )
+    return PluginMetadata.model_validate(files.read_file_yaml(files.get_abs_path(plugin_dir, META_FILE_NAME)))
 
 
 def find_plugin_dir(plugin_name: str):
@@ -362,16 +362,12 @@ def find_plugin_dir(plugin_name: str):
         return None
 
     # check if the plugin is in the user directory
-    user_plugin_path = files.get_abs_path(
-        files.USER_DIR, files.PLUGINS_DIR, plugin_name, META_FILE_NAME
-    )
+    user_plugin_path = files.get_abs_path(files.USER_DIR, files.PLUGINS_DIR, plugin_name, META_FILE_NAME)
     if files.exists(user_plugin_path):
         return files.get_abs_path(files.USER_DIR, files.PLUGINS_DIR, plugin_name)
 
     # check if the plugin is in the default directory
-    default_plugin_path = files.get_abs_path(
-        files.PLUGINS_DIR, plugin_name, META_FILE_NAME
-    )
+    default_plugin_path = files.get_abs_path(files.PLUGINS_DIR, plugin_name, META_FILE_NAME)
     if files.exists(default_plugin_path):
         return files.get_abs_path(files.PLUGINS_DIR, plugin_name)
 
@@ -396,7 +392,9 @@ def delete_plugin(plugin_name: str):
         raise ValueError("Only custom plugins can be deleted")
 
     # delete additional plugin folders
-    assets = [asset for asset in find_plugin_assets("", plugin_name=plugin_name) if not asset["path"].startswith(plugin_dir)]
+    assets = [
+        asset for asset in find_plugin_assets("", plugin_name=plugin_name) if not asset["path"].startswith(plugin_dir)
+    ]
     for asset in assets:
         files.delete_dir(asset["path"])
 
@@ -405,7 +403,7 @@ def delete_plugin(plugin_name: str):
     )  # send before deletion to properly check the extensions, second notification will be skipped automatically
 
     # does it have python files?
-    python_change = bool(files.find_existing_paths_by_pattern(plugin_dir+"/**/*.py"))
+    python_change = bool(files.find_existing_paths_by_pattern(plugin_dir + "/**/*.py"))
 
     # delete main plugin folder
     files.delete_dir(plugin_dir)
@@ -417,16 +415,12 @@ def get_plugin_paths(*subpaths: str) -> List[str]:
     sub = "*/" + "/".join(subpaths) if subpaths else "*"
     paths: List[str] = []
     for root in get_plugin_roots():
-        paths.extend(
-            files.find_existing_paths_by_pattern(files.get_abs_path(root, sub))
-        )
+        paths.extend(files.find_existing_paths_by_pattern(files.get_abs_path(root, sub)))
     return paths
 
 
 def get_enabled_plugin_paths(agent: Agent | None, *subpaths: str) -> List[str]:
-    if cached := cache.get(
-        ENABLED_PLUGINS_PATHS_CACHE_AREA, cache.determine_cache_key(agent, *subpaths)
-    ):
+    if cached := cache.get(ENABLED_PLUGINS_PATHS_CACHE_AREA, cache.determine_cache_key(agent, *subpaths)):
         return cached
 
     enabled = get_enabled_plugins(agent)
@@ -455,9 +449,7 @@ def get_enabled_plugin_paths(agent: Agent | None, *subpaths: str) -> List[str]:
 
 
 def get_enabled_plugins(agent: Agent | None):
-    if cached := cache.get(
-        ENABLED_PLUGINS_LIST_CACHE_AREA, cache.determine_cache_key(agent)
-    ):
+    if cached := cache.get(ENABLED_PLUGINS_LIST_CACHE_AREA, cache.determine_cache_key(agent)):
         return cached
 
     plugins = get_plugins_list()
@@ -502,9 +494,7 @@ def determined_toggle_from_paths(default: bool, paths: Iterator[str]):
     enabled = default
     for plugin_path in paths:
         if enabled:
-            enabled = not files.exists(
-                files.get_abs_path(plugin_path, DISABLED_FILE_NAME)
-            )
+            enabled = not files.exists(files.get_abs_path(plugin_path, DISABLED_FILE_NAME))
         else:
             enabled = files.exists(files.get_abs_path(plugin_path, ENABLED_FILE_NAME))
     return enabled
@@ -519,11 +509,7 @@ def get_toggle_state(plugin_name: str) -> ToggleState:
 
     # root plugin paths
     plugin_paths = get_plugin_roots(plugin_name)
-    state = (
-        "enabled"
-        if determined_toggle_from_paths(True, reversed(plugin_paths))
-        else "disabled"
-    )
+    state = "enabled" if determined_toggle_from_paths(True, reversed(plugin_paths)) else "disabled"
 
     # additional toggles in project/agent directories, return advanced
     if meta.per_agent_config or meta.per_project_config:
@@ -561,12 +547,8 @@ def toggle_plugin(
         for toggle in all_toggles:
             files.delete_file(toggle["path"])
 
-    enabled_file = determine_plugin_asset_path(
-        plugin_name, project_name, agent_profile, ENABLED_FILE_NAME
-    )
-    disabled_file = determine_plugin_asset_path(
-        plugin_name, project_name, agent_profile, DISABLED_FILE_NAME
-    )
+    enabled_file = determine_plugin_asset_path(plugin_name, project_name, agent_profile, ENABLED_FILE_NAME)
+    disabled_file = determine_plugin_asset_path(plugin_name, project_name, agent_profile, DISABLED_FILE_NAME)
 
     # ensure clean state by deleting both potential files first
     files.delete_file(enabled_file)
@@ -607,16 +589,12 @@ def get_plugin_config(
 
     # use default config if not found
     if not file_path:
-        file_path = files.get_abs_path(
-            find_plugin_dir(plugin_name), CONFIG_DEFAULT_FILE_NAME
-        )
+        file_path = files.get_abs_path(find_plugin_dir(plugin_name), CONFIG_DEFAULT_FILE_NAME)
         default_used = True
 
     result = None
     if file_path and files.exists(file_path):
-        result = (
-            json.loads if file_path.lower().endswith(".json") else yaml_helper.loads
-        )(files.read_file(file_path))
+        result = (json.loads if file_path.lower().endswith(".json") else yaml_helper.loads)(files.read_file(file_path))
 
         if default_used:
             _apply_defaults_from_env(plugin_name, result)
@@ -635,31 +613,21 @@ def get_plugin_config(
 
 
 def get_default_plugin_config(plugin_name: str):
-    file_path = files.get_abs_path(
-        find_plugin_dir(plugin_name), CONFIG_DEFAULT_FILE_NAME
-    )
+    file_path = files.get_abs_path(find_plugin_dir(plugin_name), CONFIG_DEFAULT_FILE_NAME)
 
     # call plugin hook to get the result
-    result = call_plugin_hook(
-        plugin_name, "get_default_plugin_config", file_path=file_path
-    )
+    result = call_plugin_hook(plugin_name, "get_default_plugin_config", file_path=file_path)
 
     # or do standard load
     if result is None and file_path and files.exists(file_path):
-        result = (
-            json.loads if file_path.lower().endswith(".json") else yaml_helper.loads
-        )(files.read_file(file_path))
+        result = (json.loads if file_path.lower().endswith(".json") else yaml_helper.loads)(files.read_file(file_path))
 
     return result
 
 
 @extension.extensible
-def save_plugin_config(
-    plugin_name: str, project_name: str, agent_profile: str, settings: dict
-):
-    file_path = determine_plugin_asset_path(
-        plugin_name, project_name, agent_profile, CONFIG_FILE_NAME
-    )
+def save_plugin_config(plugin_name: str, project_name: str, agent_profile: str, settings: dict):
+    file_path = determine_plugin_asset_path(plugin_name, project_name, agent_profile, CONFIG_FILE_NAME)
 
     # call plugin hook to get the result first
     new_settings = call_plugin_hook(
@@ -677,9 +645,7 @@ def save_plugin_config(
         # after_plugin_change([plugin_name]) # don't trigger when only config changes
 
 
-def find_plugin_asset(
-    plugin_name: str, *subpaths: str, project_name="", agent_profile=""
-):
+def find_plugin_asset(plugin_name: str, *subpaths: str, project_name="", agent_profile=""):
     result = find_plugin_assets(
         *subpaths,
         plugin_name=plugin_name,
@@ -704,9 +670,7 @@ def find_plugin_assets(
     def _collect(path: str, proj: str, profile: str) -> bool:
         is_glob = glob.has_magic(path)
         matched_paths = (
-            files.find_existing_paths_by_pattern(path)
-            if is_glob
-            else ([path] if files.exists(path) else [])
+            files.find_existing_paths_by_pattern(path) if is_glob else ([path] if files.exists(path) else [])
         )
 
         need_proj = proj == "*"
@@ -722,9 +686,7 @@ def find_plugin_assets(
 
         for matched in matched_paths:
             inferred_proj = _after(matched, "/projects/") if need_proj else proj
-            inferred_prof = (
-                _after(matched, "/agents/", last=True) if need_prof else profile
-            )
+            inferred_prof = _after(matched, "/agents/", last=True) if need_prof else profile
             results.append(
                 {
                     "project_name": inferred_proj,
@@ -751,9 +713,7 @@ def find_plugin_assets(
                 return results
         if not agent_profile or agent_profile == "*":
             # project/.ctx0proj/plugins/<plugin_name>/...
-            path = projects.get_project_meta(
-                project_name, files.PLUGINS_DIR, plugin_name, *subpaths
-            )
+            path = projects.get_project_meta(project_name, files.PLUGINS_DIR, plugin_name, *subpaths)
             if _collect(path, project_name, ""):
                 return results
 
@@ -805,9 +765,7 @@ def find_plugin_assets(
     return results
 
 
-def determine_plugin_asset_path(
-    plugin_name: str, project_name: str, agent_profile: str, *subpaths: str
-):
+def determine_plugin_asset_path(plugin_name: str, project_name: str, agent_profile: str, *subpaths: str):
     base_path = files.get_abs_path(files.USER_DIR)
 
     if project_name:
@@ -834,9 +792,7 @@ def send_frontend_reload_notification(plugin_names: list[str] | None = None):
         has_webui_extension = False
         for plugin_name in plugin_names:
             plugin_dir = find_plugin_dir(plugin_name)
-            if plugin_dir and files.exists(
-                files.get_abs_path(plugin_dir, "extensions", "webui")
-            ):
+            if plugin_dir and files.exists(files.get_abs_path(plugin_dir, "extensions", "webui")):
                 has_webui_extension = True
                 break
         if not has_webui_extension:
@@ -863,9 +819,7 @@ def send_frontend_reload_notification(plugin_names: list[str] | None = None):
     DeferredTask().start_task(_send_later)
 
 
-def call_plugin_hook(
-    plugin_name: str, hook_name: str, default: Any = None, *args, **kwargs
-):
+def call_plugin_hook(plugin_name: str, hook_name: str, default: Any = None, *args, **kwargs):
     hooks = None
 
     # use cached hooks if enabled
@@ -874,9 +828,7 @@ def call_plugin_hook(
         if not plugin_dir:
             return default  # plugin directory not found, skip hooks
         hooks_script = files.get_abs_path(plugin_dir, HOOKS_SCRIPT)
-        hooks = (
-            modules.import_module(hooks_script) if files.exists(hooks_script) else None
-        )
+        hooks = modules.import_module(hooks_script) if files.exists(hooks_script) else None
         cache.add(HOOKS_CACHE_AREA, plugin_name, hooks)
     else:
         hooks = cache.get(HOOKS_CACHE_AREA, plugin_name)
