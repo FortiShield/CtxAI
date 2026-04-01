@@ -33,12 +33,8 @@ DEFAULT_HEALTH_URL = os.environ.get(
     "CTX0_SELF_UPDATE_HEALTH_URL",
     "http://127.0.0.1:80/api/health",
 )
-DEFAULT_HEALTH_TIMEOUT_SECONDS = int(
-    os.environ.get("CTX0_SELF_UPDATE_HEALTH_TIMEOUT_SECONDS", "120")
-)
-DEFAULT_HEALTH_POLL_INTERVAL_SECONDS = float(
-    os.environ.get("CTX0_SELF_UPDATE_HEALTH_POLL_INTERVAL_SECONDS", "2")
-)
+DEFAULT_HEALTH_TIMEOUT_SECONDS = int(os.environ.get("CTX0_SELF_UPDATE_HEALTH_TIMEOUT_SECONDS", "120"))
+DEFAULT_HEALTH_POLL_INTERVAL_SECONDS = float(os.environ.get("CTX0_SELF_UPDATE_HEALTH_POLL_INTERVAL_SECONDS", "2"))
 DEFAULT_BACKUP_DIR = "/root/update-backups"
 DEFAULT_BACKUP_CONFLICT_POLICY = "rename"
 BACKUP_CONFLICT_POLICIES = {"rename", "overwrite", "fail"}
@@ -216,8 +212,7 @@ def get_latest_same_major_tag(
     ]
     if not same_major_tags:
         raise RuntimeError(
-            f"No v{current_major}.x release tags are reachable from branch "
-            f"{branch_ref.rsplit('/', 1)[-1]}."
+            f"No v{current_major}.x release tags are reachable from branch {branch_ref.rsplit('/', 1)[-1]}."
         )
     return sort_selector_supported_tags(same_major_tags)[0]
 
@@ -238,8 +233,7 @@ def ensure_latest_target_matches_current_major(
     target_major = parse_major_version(target_version)
     if target_major is None or not is_supported_selector_tag(target_version):
         raise RuntimeError(
-            f"Could not resolve latest on branch {branch} to a supported vX.Y release. "
-            "Use an explicit tag instead."
+            f"Could not resolve latest on branch {branch} to a supported vX.Y release. Use an explicit tag instead."
         )
 
     if target_major != current_major:
@@ -398,8 +392,7 @@ def run_command(
         logger.log_block("stderr", completed.stderr)
     if completed.returncode != 0:
         raise RuntimeError(
-            error_message
-            or f"Command failed with exit code {completed.returncode}: {' '.join(command)}"
+            error_message or f"Command failed with exit code {completed.returncode}: {' '.join(command)}"
         )
     return completed
 
@@ -439,8 +432,7 @@ def create_rollback_stash(repo_dir: Path, logger: AttemptLogger) -> str | None:
     if not stash_ref or stash_ref == previous_top:
         raise RuntimeError("Failed to create the pre-update rollback stash.")
     logger.log(
-        f"Saved local tracked/untracked changes into {stash_ref}. "
-        "Ignored files stay in place and are not stashed."
+        f"Saved local tracked/untracked changes into {stash_ref}. Ignored files stay in place and are not stashed."
     )
     return stash_ref
 
@@ -471,9 +463,7 @@ def apply_stash(repo_dir: Path, stash_ref: str, logger: AttemptLogger) -> None:
     try:
         drop_stash(repo_dir, stash_ref, logger)
     except Exception as exc:
-        logger.log(
-            f"Rollback stash {stash_ref} was restored but could not be dropped automatically: {exc}"
-        )
+        logger.log(f"Rollback stash {stash_ref} was restored but could not be dropped automatically: {exc}")
 
 
 def clean_repo_worktree(
@@ -598,9 +588,7 @@ def resolve_requested_target(
         current_version=current_version,
         target_version=head_short_tag,
     )
-    logger.log(
-        f"Resolved latest on branch {branch} to commit {head_commit[:7]} ({head_describe})"
-    )
+    logger.log(f"Resolved latest on branch {branch} to commit {head_commit[:7]} ({head_describe})")
     return {
         "requested_tag": LATEST_SELECTOR_TAG,
         "effective_tag": head_short_tag,
@@ -692,7 +680,8 @@ def launch_ui_process(repo_dir: Path, logger: AttemptLogger) -> subprocess.Popen
         [
             sys.executable,
             str(repo_dir / "run_ui.py"),
-            "--dockerized=true",
+            "--dockerized=false",
+            "--development=true",
             "--port=80",
             "--host=0.0.0.0",
         ],
@@ -873,7 +862,10 @@ def execute_pending_update(
                 "Git checkout completed but the repository commit does not match the requested target. "
                 f"Expected {resolved_target['expected_commit']}, got {current_info['commit']}."
             )
-        if resolved_target.get("expected_short_tag") and current_info["short_tag"] != resolved_target["expected_short_tag"]:
+        if (
+            resolved_target.get("expected_short_tag")
+            and current_info["short_tag"] != resolved_target["expected_short_tag"]
+        ):
             raise RuntimeError(
                 "Git checkout completed but the repository version does not match the requested tag. "
                 f"Expected {resolved_target['expected_short_tag']}, got {current_info['short_tag']}."
@@ -908,9 +900,7 @@ def execute_pending_update(
                 try:
                     drop_stash(REPO_DIR, stash_ref, logger)
                 except Exception as exc:
-                    logger.log(
-                        f"Temporary rollback stash {stash_ref} could not be dropped automatically: {exc}"
-                    )
+                    logger.log(f"Temporary rollback stash {stash_ref} could not be dropped automatically: {exc}")
             return updated_process
 
         logger.log(f"Updated UI failed health check, rolling back: {details}")
@@ -939,8 +929,7 @@ def execute_pending_update(
             record_result(
                 status="rolled_back",
                 message=(
-                    "Updated version failed its health check and the previous version was restored. "
-                    f"Reason: {details}"
+                    f"Updated version failed its health check and the previous version was restored. Reason: {details}"
                 ),
                 request_data=request_data,
                 source_info=source_info,
@@ -955,9 +944,7 @@ def execute_pending_update(
         terminate_process(rollback_process)
         record_result(
             status="rollback_failed",
-            message=(
-                "Updated version failed its health check and rollback also failed to become healthy."
-            ),
+            message=("Updated version failed its health check and rollback also failed to become healthy."),
             request_data=request_data,
             source_info=source_info,
             current_version=source_info["short_tag"],
@@ -1159,9 +1146,7 @@ def docker_run_ui() -> int:
                 requested_branch=requested_branch,
                 requested_tag=requested_tag,
             ):
-                logger.log(
-                    "Requested tag already matches the installed version, skipping file replacement."
-                )
+                logger.log("Requested tag already matches the installed version, skipping file replacement.")
                 record_result(
                     status="skipped",
                     message="Requested tag already matches the installed version.",
